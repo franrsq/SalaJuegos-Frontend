@@ -18,6 +18,9 @@ import { FormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
+import {MatCardModule} from '@angular/material/card';
+import { FlexLayoutModule } from "@angular/flex-layout";
+
 
 //Firebase
 import { AngularFireModule } from "@angular/fire";
@@ -28,12 +31,14 @@ import { AuthService } from "./shared/services/auth-service";
 // Components
 import { LoginComponent } from './components/login/login.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    SignUpComponent
+    SignUpComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     BrowserModule,
@@ -54,6 +59,8 @@ import { SignUpComponent } from './components/sign-up/sign-up.component';
     MatSnackBarModule,
     HttpClientModule,
     MatDialogModule,
+    MatCardModule,
+    FlexLayoutModule,
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]

@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class SignUpComponent implements OnInit {
 
-  loginForm: FormGroup;
+  form: FormGroup;
 
   constructor(
     public authService: AuthService,
@@ -20,13 +20,21 @@ export class SignUpComponent implements OnInit {
 
   ngOnInit(): void {
     // Valida los campos requeridos
-    this.loginForm = this.formBuilder.group({
-      user: ['', Validators.required],
-      password: ['', Validators.required]
+    this.form = this.formBuilder.group({
+      nickname: ['', Validators.required],
+      email: ['', Validators.required],
+      password: ['', Validators.required],
+      confirmPassword: ['', Validators.required]
     });
   }
 
-  login(){
+  register(){
+    console.log("hola")
+    console.log(this.form.value.nickname, this.form.value.email, this.form.value.password, this.form.value.confirmPassword);
+    if(this.form.value.password === this.form.value.confirmPassword){
 
+    }
+    
+    this.authService.SignUp(this.form.value.nickname, this.form.value.email, this.form.value.password);
   }
 }

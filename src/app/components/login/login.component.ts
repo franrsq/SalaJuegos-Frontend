@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { AuthService } from 'src/app/shared/services/auth-service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -9,24 +10,30 @@ import { Router } from '@angular/router';
 })
 export class LoginComponent implements OnInit {
 
-  loginForm: FormGroup;
+  form: FormGroup;
 
-  constructor(private router: Router, private formBuilder: FormBuilder) { }
+  constructor(
+    private router: Router,
+    private formBuilder: FormBuilder,
+    public authService: AuthService
+  ) { }
 
   ngOnInit(): void {
     // Valida los campos requeridos
-    this.loginForm = this.formBuilder.group({
-      user: ['', Validators.required],
+    this.form = this.formBuilder.group({
+      email: ['', Validators.required],
       password: ['', Validators.required]
     });
+    console.log(this.authService.isLoggedIn)
   }
 
   login(){
-
+    this.authService.SignIn(this.form.value.email, this.form.value.password);
+    console.log("funcionaaa");
   }
 
-  signin(){
-    this.router.navigateByUrl('/register-user');
+  loginGoogle(){
+    this.authService.GoogleAuth();
   }
 
 }

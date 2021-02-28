@@ -1,26 +1,26 @@
-<div class="login-wrap">
-    <div class="login-html">
-        <input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Iniciar Sesión</label>
-        <input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab"></label>
-        <form class="login-form" [formGroup]="loginForm" (ngSubmit)="login()">
-            <div class="sign-in-htm">
+<div class="main-wrapper" fxLayout="row" fxLayoutAlign="center center">
 
-                <div class="group">
-                    <label for="user" class="label">Nombre de usuario</label>
-                    <input id="user" type="text" class="input" formControlName="user">
-                </div>
-                <div class="group">
-                    <label for="pass" class="label">Contraseña</label>
-                    <input id="pass" type="password" class="input" data-type="password" formControlName="password">
-                </div>
-                <div class="group">
-                    <button mat-button type="submit" class="button">Iniciar Sesión</button>
-                </div>
-                <div class="hr"></div>
-                <div class="group">
-                    <button mat-button type="submit" class="button" (click)="signin()">Registrarse</button>
-                </div>
-            </div>
-        </form  >
-    </div>
-</div>
+    <mat-card class="box">
+      <mat-card-header>
+        <mat-card-title>Login</mat-card-title>
+      </mat-card-header>
+  
+      <form class="example-form" [formGroup]="form">
+        <mat-card-content>
+          <mat-form-field class="example-full-width">
+            <input formControlName="email" matInput placeholder="Email">
+          </mat-form-field>
+  
+          <mat-form-field class="example-full-width">
+            <input type="password" formControlName="password" matInput placeholder="Contraseña">
+          </mat-form-field>
+          <a [routerLink]="['/forgot-password']">¿Olvido su contraseña?</a>.
+        </mat-card-content>
+        <button mat-stroked-button color="accent" (click)="login()" class="btn-block">Login</button>
+        <button mat-stroked-button color="accent" [routerLink]="['/register-user']" class="btn-block">Registrar</button>
+        <button mat-stroked-button color="accent" (click)="loginGoogle()" class="btn-block">Google</button>
+
+      </form>
+    </mat-card>
+  
+  </div>
