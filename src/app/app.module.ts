@@ -31,14 +31,16 @@ import { AuthService } from "./shared/services/auth-service";
 // Components
 import { LoginComponent } from './components/login/login.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
-import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component'
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { ChooseGameComponent } from './components/choose-game/choose-game.component'
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     SignUpComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    ChooseGameComponent
   ],
   imports: [
     BrowserModule,
