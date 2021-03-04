@@ -1,6 +1,5 @@
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
-html,
-body {
+html, body {
 	height: 100%;
 	margin: 0;
 	padding: 0;
@@ -77,8 +76,7 @@ body {
 	width: 100%;
 }
 
-.main-wrapper .example-full-width,
-.main-wrapper .btn-block {
+.main-wrapper .example-full-width, .main-wrapper .btn-block {
 	width: 100%;
 }
 

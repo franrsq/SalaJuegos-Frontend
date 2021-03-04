@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/shared/services/auth-service';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +16,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private router: Router,
     private formBuilder: FormBuilder,
-    public authService: AuthService
+    public authService: AuthService,
+    private toastr: ToastrService
   ) { }
 
   ngOnInit(): void {
@@ -24,16 +26,26 @@ export class LoginComponent implements OnInit {
       email: ['', Validators.required],
       password: ['', Validators.required]
     });
-    console.log(this.authService.isLoggedIn)
   }
 
-  login(){
-    this.authService.SignIn(this.form.value.email, this.form.value.password);
-    console.log("funcionaaa");
+  login() {
+    this.authService.SignIn(this.form.value.email, this.form.value.password)
+      .then(() => {
+        this.toastr.success('Inicio de sesión exitoso');
+      })
+      .catch((error) => {
+        this.toastr.error('Hubo un error al iniciar sesión');
+      });
   }
 
-  loginGoogle(){
-    this.authService.GoogleAuth();
+  loginGoogle() {
+    this.authService.GoogleAuth()
+      .then(() => {
+        this.toastr.success('Inicio de sesión exitoso');
+      })
+      .catch((error) => {
+        this.toastr.error('Hubo un error al iniciar sesión');
+      });
   }
 
 }

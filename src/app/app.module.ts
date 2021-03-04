@@ -18,7 +18,7 @@ import { FormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from "@angular/flex-layout";
 
 
@@ -32,6 +32,8 @@ import { AuthService } from "./shared/services/auth-service";
 import { LoginComponent } from './components/login/login.component';
 import { SignUpComponent } from './components/sign-up/sign-up.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component'
+
+import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
   declarations: [
@@ -53,7 +55,7 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
     MatFormFieldModule,
     MatButtonModule,
     ReactiveFormsModule,
-    MatCheckboxModule, 
+    MatCheckboxModule,
     FormsModule,
     HttpClientModule,
     MatSnackBarModule,
@@ -61,6 +63,7 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
     MatDialogModule,
     MatCardModule,
     FlexLayoutModule,
+    ToastrModule.forRoot(),
   ],
   providers: [AuthService],
   bootstrap: [AppComponent]
