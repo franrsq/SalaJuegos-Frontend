@@ -4,13 +4,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { ForgotPasswordComponent } from '../app/components/forgot-password/forgot-password.component';
 import { LoginComponent } from '../app/components/login/login.component';
 import { SignUpComponent } from '../app/components/sign-up/sign-up.component';
+import { ChooseGameComponent } from './components/choose-game/choose-game.component';
 
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register-user', component: SignUpComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent }
+  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'choose-game', component: ChooseGameComponent }
 ];
 
 @NgModule({
