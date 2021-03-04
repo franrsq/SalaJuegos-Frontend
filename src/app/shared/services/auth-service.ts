@@ -14,7 +14,7 @@ export class AuthService {
   constructor(
     public afAuth: AngularFireAuth, // Inject Firebase auth service
     public router: Router
-  ) {    
+  ) {
     /* Saving user data in localstorage when 
     logged in and setting up null when logged out */
     this.afAuth.authState.subscribe(user => {
@@ -33,9 +33,7 @@ export class AuthService {
   SignIn(email, password) {
     return this.afAuth.signInWithEmailAndPassword(email, password)
       .then((result) => {
-        //this.ngZone.run(() => {
-          //this.router.navigate(['dashboard']);
-        //});
+        this.router.navigate(['choose-game']);
         //this.SetUserData(result.user);
       }).catch((error) => {
         window.alert(error.message)
@@ -56,21 +54,21 @@ export class AuthService {
   }
 
   // Send email verfificaiton when new user sign up
- async SendVerificationMail() {
+  async SendVerificationMail() {
     return (await this.afAuth.currentUser).sendEmailVerification()
-    .then(() => {
-      //this.router.navigate(['verify-email-address']);
-    })
+      .then(() => {
+        //this.router.navigate(['verify-email-address']);
+      })
   }
 
   // Reset Forggot password
   ForgotPassword(passwordResetEmail) {
     return this.afAuth.sendPasswordResetEmail(passwordResetEmail)
-    .then(() => {
-      window.alert('Password reset email sent, check your inbox.');
-    }).catch((error) => {
-      window.alert(error)
-    })
+      .then(() => {
+        window.alert('Password reset email sent, check your inbox.');
+      }).catch((error) => {
+        window.alert(error)
+      })
   }
 
   // Returns true when user is looged in and email is verified
@@ -87,14 +85,12 @@ export class AuthService {
   // Auth logic to run auth providers
   AuthLogin(provider) {
     return this.afAuth.signInWithPopup(provider)
-    .then((result) => {
-       /*this.ngZone.run(() => {
-          this.router.navigate(['dashboard']);
-        })*/
-      //this.SetUserData(result.user);
-    }).catch((error) => {
-      window.alert(error)
-    })
+      .then((result) => {
+        this.router.navigate(['choose-game']);
+        //this.SetUserData(result.user);
+      }).catch((error) => {
+        window.alert(error)
+      })
   }
 
   // Sign out 
