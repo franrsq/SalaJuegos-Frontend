@@ -35,6 +35,7 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { ChooseGameComponent } from './components/choose-game/choose-game.component'
 
 import { ToastrModule } from 'ngx-toastr';
+import { GameBoardComponent } from './components/game-board/game-board.component';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import { ToastrModule } from 'ngx-toastr';
     LoginComponent,
     SignUpComponent,
     ForgotPasswordComponent,
-    ChooseGameComponent
+    ChooseGameComponent,
+    GameBoardComponent
   ],
   imports: [
     BrowserModule,
