@@ -7,6 +7,6 @@ export class Board {
 
     constructor(rows: number, columns: number, boardStyle: BoardStyle, checkersEngine: CheckersEngine) {
         this.board = boardStyle.generateBoard(rows, columns);
-        this.board = checkersEngine.initGame(this.board);
+        checkersEngine.initGame(this.board);
     }
 }

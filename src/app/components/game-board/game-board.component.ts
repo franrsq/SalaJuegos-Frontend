@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CheckersBoardStyle } from 'src/app/game/checkers/checkers-style';
-import { Space } from 'src/app/game/space';
 import { Board } from '../../game/board';
 import { CheckersEngine } from "../../game/checkers/checkers-engine"
 import { BoardSizeDialogComponent } from '../board-size-dialog/board-size-dialog.component';
@@ -22,7 +21,7 @@ export class GameBoardComponent implements OnInit {
 
   ngOnInit(): void {
     console.log("segundo " + this.board.board[0][0].piece.getPieceImg());
-    this.openDialog();
+    //this.openDialog();
   }
 
   openDialog(): void {
