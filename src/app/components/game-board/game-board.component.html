@@ -2,7 +2,11 @@
     <div *ngFor="let row of board.board">
         <div class="space" *ngFor="let space of row">
             <img [src]="space.styleImage">
-            <img class="piece" src="assets/game/red-piece.svg">
+            <div *ngIf="!space.piece; else notnull">
+            </div>
+            <ng-template #notnull>
+                <img class="piece" src="{{space.piece.getPieceImg()}}">
+            </ng-template>
         </div>
     </div>
 </div>
