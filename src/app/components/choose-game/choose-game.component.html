@@ -3,16 +3,17 @@
 
     <mat-card class="card">
         <mat-card-header>
-          <mat-card-title>Damas chinas</mat-card-title>
+          <mat-card-title>Damas españolas</mat-card-title>
         </mat-card-header>
-        <img mat-card-image src="assets/cheeckers.jpg" alt="Photo of a Shiba Inu">
+        <img mat-card-image src="assets/cheeckers.jpg" alt="Photo of a cheeckers">
         <mat-card-content>
           <p>
             Descripción del juego.
           </p>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-stroked-button class="btn-block" color="accent">Jugar damas chinas</button>
+          <button mat-stroked-button class="btn-block" color="accent" [routerLink]="['/game-board']">Jugar en local</button>
+          <button mat-stroked-button class="btn-block" color="accent" [routerLink]="['/game-board']">Jugar multijugador</button>
         </mat-card-actions>
       </mat-card>
 
@@ -22,14 +23,15 @@
         <mat-card-header>
           <mat-card-title>4 en linea</mat-card-title>
         </mat-card-header>
-        <img mat-card-image src="assets/line.jpg" alt="Photo of a Shiba Inu">
+        <img mat-card-image src="assets/line.jpg" alt="Photo of four in line">
         <mat-card-content>
           <p>
             Descripción del juego.
           </p>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-stroked-button class="btn-block" color="accent">Jugar 4 en linea</button>
+          <button mat-stroked-button class="btn-block" color="accent">Jugar en local</button>
+          <button mat-stroked-button class="btn-block" color="accent">Jugar multijugador</button>
         </mat-card-actions>
       </mat-card>
 
@@ -39,14 +41,15 @@
         <mat-card-header>
           <mat-card-title>Othello</mat-card-title>
         </mat-card-header>
-        <img mat-card-image src="assets/othello.png" alt="Photo of a Shiba Inu">
+        <img mat-card-image src="assets/othello.png" alt="Photo of a othello">
         <mat-card-content>
           <p>
             Descripción del juego.
           </p>
         </mat-card-content>
         <mat-card-actions>
-          <button mat-stroked-button class="btn-block" color="accent">Jugar othello</button>
+          <button mat-stroked-button class="btn-block" color="accent">Jugar en local</button>
+          <button mat-stroked-button class="btn-block" color="accent">Jugar multijugador</button>
         </mat-card-actions>
       </mat-card>
 </div>

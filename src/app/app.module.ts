@@ -36,6 +36,7 @@ import { ChooseGameComponent } from './components/choose-game/choose-game.compon
 
 import { ToastrModule } from 'ngx-toastr';
 import { GameBoardComponent } from './components/game-board/game-board.component';
+import { BoardSizeDialogComponent } from './components/board-size-dialog/board-size-dialog.component';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import { GameBoardComponent } from './components/game-board/game-board.component
     SignUpComponent,
     ForgotPasswordComponent,
     ChooseGameComponent,
-    GameBoardComponent
+    GameBoardComponent,
+    BoardSizeDialogComponent
   ],
   imports: [
     BrowserModule,
