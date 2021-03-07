@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { CheckersBoardStyle } from 'src/app/game/checkers/checkers-style';
+import { CheckersService } from 'src/app/shared/services/checkers/checkers.service';
 import { Board } from '../../game/board';
 import { CheckersEngine } from "../../game/checkers/checkers-engine"
-import { BoardSizeDialogComponent } from '../board-size-dialog/board-size-dialog.component';
 
 @Component({
   selector: 'app-game-board',
@@ -12,31 +12,16 @@ import { BoardSizeDialogComponent } from '../board-size-dialog/board-size-dialog
 })
 export class GameBoardComponent implements OnInit {
 
-  size: string;
-  board = new Board(8, 8, new CheckersBoardStyle(), new CheckersEngine());
+  board: Board;
 
   constructor(
-    public dialog: MatDialog,
+    private _checkersService: CheckersService,
   ) { }
 
   ngOnInit(): void {
+    this.board = new Board(this._checkersService.boardSize, this._checkersService.boardSize, new CheckersBoardStyle(), new CheckersEngine());
     console.log("segundo " + this.board.board[0][0].piece.getPieceImg());
     //this.openDialog();
-  }
-
-  openDialog(): void {
-    const dialogRef = this.dialog.open(BoardSizeDialogComponent, {
-      disableClose: true,
-      width: '35%',
-      height: '45%',
-      data: { size: this.size }
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      if (result != undefined) {
-        this.size = result; //llama al otro dialog
-      }
-    });
   }
 
   spaceClick(space) {
