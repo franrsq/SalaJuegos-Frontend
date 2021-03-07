@@ -38,4 +38,8 @@ export class GameBoardComponent implements OnInit {
       }
     });
   }
+
+  spaceClick(space) {
+    this.board.onClick(space.row, space.column);
+  }
 }

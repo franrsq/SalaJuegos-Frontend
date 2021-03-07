@@ -1,12 +1,32 @@
 import { BoardStyle } from "./board-style";
-import { CheckersEngine } from "./checkers/checkers-engine"
+import { Engine } from "./engine"
 import { Space } from "./space";
 
 export class Board {
     board: Space[][];
+    engine: Engine;
 
-    constructor(rows: number, columns: number, boardStyle: BoardStyle, checkersEngine: CheckersEngine) {
+    constructor(rows: number, columns: number, boardStyle: BoardStyle, engine: Engine) {
         this.board = boardStyle.generateBoard(rows, columns);
-        checkersEngine.initGame(this.board);
+        this.engine = engine;
+        engine.initGame(this);
+    }
+
+    onClick(row: Number, column: Number) {
+        this.engine.click(row, column);
+    }
+
+    highlight(spaces: Space[]) {
+        for (let i = 0; i < spaces.length; i++) {
+            spaces[i].highlight = true;
+        }
+    }
+
+    removeHighlight() {
+        for (let i = 0; i < this.board.length; i++) {
+            for (let j = 0; j < this.board[i].length; j++) {
+                this.board[i][j].highlight = false;
+            }
+        }
     }
 }

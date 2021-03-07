@@ -1,8 +1,12 @@
 .board {
-    display: flex;
+    display: block;
     margin: auto;
     height: 600px;
     width: 600px;
+}
+
+.row {
+    display: flex;
 }
 
 .space {
@@ -30,7 +34,7 @@
         height: 37.25px;
         width: 37.25px;
     }
-    .piece{
+    .piece {
         height: 37.25px;
         width: 37.25px;
     }

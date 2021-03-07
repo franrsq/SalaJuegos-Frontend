@@ -1,7 +1,7 @@
 <div class="board">
-    <div *ngFor="let row of board.board">
-        <div class="space" *ngFor="let space of row">
-            <img [src]="space.styleImage">
+    <div class="row" *ngFor="let row of board.board">
+        <div (click)="spaceClick(space)" class="space" *ngFor="let space of row">
+            <img [src]="space.getStyle()">
             <div *ngIf="!space.piece; else notnull">
             </div>
             <ng-template #notnull>

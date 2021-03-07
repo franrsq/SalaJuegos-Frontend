@@ -14,4 +14,11 @@ export class Space {
         this.styleImage = styleImage;
         this.highlightStyle = highlightStyle;
     }
+
+    getStyle() {
+        if (this.highlight) {
+            return this.highlightStyle;
+        }
+        return this.styleImage;
+    }
 }
