@@ -27,6 +27,8 @@ import { AngularFireModule } from "@angular/fire";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { environment } from 'src/environments/environment';
 import { AuthService } from "./shared/services/auth.service";
+import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
+import { USE_EMULATOR as USE_FIRESTORE_EMULATOR } from '@angular/fire/firestore';
 
 // Components
 import { LoginComponent } from './components/login/login.component';
@@ -73,7 +75,10 @@ import { NicknameDialogComponent } from './components/nickname-dialog/nickname-d
     FlexLayoutModule,
     ToastrModule.forRoot(),
   ],
-  providers: [AuthService],
+  providers: [
+    { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined },
+    { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
