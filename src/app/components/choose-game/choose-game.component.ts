@@ -18,7 +18,7 @@ export class ChooseGameComponent implements OnInit {
 
   ngOnInit(): void {
     const data = JSON.parse(localStorage.getItem('nickname'));
-    if (!data.nickname) {
+    if (!data) {
       this.nickNameDialog();
     }
   }

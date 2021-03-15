@@ -39,11 +39,17 @@ export class AuthService {
         this.nickNameSubscription = this.firestore.collection('users').doc(user.uid)
           .valueChanges()
           .subscribe((data: any) => {
-            this.userData['nickname'] = data.nickname;
-            localStorage.setItem('nickname', JSON.stringify(data));
+            if (data) {
+              this.userData['nickname'] = data.nickname;
+              localStorage.setItem('nickname', JSON.stringify(data));
+            } else {
+              localStorage.setItem('nickname', null);
+            }
+            this.router.navigate(['choose-game']);
           });
       } else {
         localStorage.setItem('user', null);
+        localStorage.setItem('nickname', null);
         JSON.parse(localStorage.getItem('user'));
       }
     });
@@ -51,10 +57,7 @@ export class AuthService {
 
   // Sign in with email/password
   SignIn(email, password) {
-    return this.afAuth.signInWithEmailAndPassword(email, password)
-      .then((result) => {
-        this.router.navigate(['choose-game']);
-      });
+    return this.afAuth.signInWithEmailAndPassword(email, password);
   }
 
   // Sign up with email/password
@@ -91,10 +94,7 @@ export class AuthService {
 
   // Auth logic to run auth providers
   AuthLogin(provider) {
-    return this.afAuth.signInWithPopup(provider)
-      .then((result) => {
-        this.router.navigate(['choose-game']);
-      });
+    return this.afAuth.signInWithPopup(provider);
   }
 
   saveNickname(nickname) {
@@ -115,6 +115,7 @@ export class AuthService {
   SignOut() {
     return this.afAuth.signOut().then(() => {
       localStorage.removeItem('user');
+      localStorage.setItem('nickname', null);
       this.router.navigate(['sign-in']);
     });
   }
