@@ -17,8 +17,8 @@ export class ChooseGameComponent implements OnInit {
   constructor(public dialog: MatDialog, private router: Router, private authService: AuthService) { }
 
   ngOnInit(): void {
-    const user = JSON.parse(localStorage.getItem('user'));
-    if (!user.nickname) {
+    const data = JSON.parse(localStorage.getItem('nickname'));
+    if (!data.nickname) {
       this.nickNameDialog();
     }
   }

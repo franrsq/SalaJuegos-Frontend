@@ -40,6 +40,7 @@ export class AuthService {
           .valueChanges()
           .subscribe((data: any) => {
             this.userData['nickname'] = data.nickname;
+            localStorage.setItem('nickname', JSON.stringify(data));
           });
       } else {
         localStorage.setItem('user', null);
@@ -103,7 +104,7 @@ export class AuthService {
   private saveNickName(nickname, user) {
     const userRef: AngularFirestoreDocument<any> = this.firestore.doc(`users/${user.uid}`);
     const userData = {
-      nickName: nickname,
+      nickname: nickname,
     };
     return userRef.set(userData, {
       merge: true
