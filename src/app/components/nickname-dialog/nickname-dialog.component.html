@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>Elije un nickname</h2>
+
+<mat-dialog-content [formGroup]="form">
+
+    <mat-form-field>
+        <input matInput placeholder="Nickname" formControlName="nickname">
+        <mat-error>*Este campo es <strong>requerido</strong></mat-error>
+    </mat-form-field>
+
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button [disabled]="form.invalid" type="submit" mat-button class="mat-raised-button mat-primary"
+        (click)="save()">Guardar</button>
+</mat-dialog-actions>

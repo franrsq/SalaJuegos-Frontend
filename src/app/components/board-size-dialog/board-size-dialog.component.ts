@@ -12,7 +12,7 @@ export class BoardSizeDialogComponent {
   constructor(
     public dialogRef: MatDialogRef<BoardSizeDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private _checkersService: CheckersService,) { }
+    private _checkersService: CheckersService) { }
 
   validateSize(size: string) {
     if (size != undefined) {
@@ -27,7 +27,7 @@ export class BoardSizeDialogComponent {
       } else {
         console.log("Tiene que ser mayor a 3")
       }
-    }else{
+    } else {
       console.log("Debe ingresar un número")
     }
   }

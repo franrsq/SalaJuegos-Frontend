@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { CheckersBoardStyle } from 'src/app/game/checkers/checkers-style';
 import { CheckersService } from 'src/app/shared/services/checkers/checkers.service';
 import { Board } from '../../game/board';
-import { CheckersEngine } from "../../game/checkers/checkers-engine"
+import { CheckersEngine } from "../../game/checkers/checkers-engine";
 
 @Component({
   selector: 'app-game-board',
@@ -15,7 +14,7 @@ export class GameBoardComponent implements OnInit {
   board: Board;
 
   constructor(
-    private _checkersService: CheckersService,
+    private _checkersService: CheckersService
   ) { }
 
   ngOnInit(): void {

@@ -16,7 +16,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from "@angular/flex-layout";
@@ -26,7 +26,7 @@ import { FlexLayoutModule } from "@angular/flex-layout";
 import { AngularFireModule } from "@angular/fire";
 import { AngularFireAuthModule } from "@angular/fire/auth";
 import { environment } from 'src/environments/environment';
-import { AuthService } from "./shared/services/auth-service";
+import { AuthService } from "./shared/services/auth.service";
 
 // Components
 import { LoginComponent } from './components/login/login.component';
@@ -37,6 +37,7 @@ import { ChooseGameComponent } from './components/choose-game/choose-game.compon
 import { ToastrModule } from 'ngx-toastr';
 import { GameBoardComponent } from './components/game-board/game-board.component';
 import { BoardSizeDialogComponent } from './components/board-size-dialog/board-size-dialog.component';
+import { NicknameDialogComponent } from './components/nickname-dialog/nickname-dialog.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { BoardSizeDialogComponent } from './components/board-size-dialog/board-s
     ForgotPasswordComponent,
     ChooseGameComponent,
     GameBoardComponent,
-    BoardSizeDialogComponent
+    BoardSizeDialogComponent,
+    NicknameDialogComponent
   ],
   imports: [
     BrowserModule,
