@@ -15,8 +15,8 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register-user', component: SignUpComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-  { path: 'choose-game', component: ChooseGameComponent, canActivate: [AngularFireAuthGuard] },
-  { path: 'game-board', component: GameBoardComponent, canActivate: [AngularFireAuthGuard] }
+  { path: 'choose-game', component: ChooseGameComponent/*, canActivate: [AngularFireAuthGuard]*/ },
+  { path: 'game-board', component: GameBoardComponent/*, canActivate: [AngularFireAuthGuard]*/ }
 ];
 
 @NgModule({

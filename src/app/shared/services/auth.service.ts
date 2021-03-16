@@ -5,6 +5,7 @@ import firebase from 'firebase/app';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import { Router } from "@angular/router";
 import { User } from '../model/user';
+import { Space } from 'src/app/game/space';
 
 @Injectable({
   providedIn: 'root'
@@ -119,5 +120,4 @@ export class AuthService {
       this.router.navigate(['sign-in']);
     });
   }
-
 }

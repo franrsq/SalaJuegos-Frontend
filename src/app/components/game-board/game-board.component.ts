@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CheckersBoardStyle } from 'src/app/game/checkers/checkers-style';
 import { CheckersService } from 'src/app/shared/services/checkers/checkers.service';
-import { Board } from '../../game/board';
+import { FirestoreService } from 'src/app/shared/services/firestore.service';
+import { BoardManager } from '../../game/board-manager';
 import { CheckersEngine } from "../../game/checkers/checkers-engine";
 
 @Component({
@@ -11,15 +12,16 @@ import { CheckersEngine } from "../../game/checkers/checkers-engine";
 })
 export class GameBoardComponent implements OnInit {
 
-  board: Board;
+  board: BoardManager;
 
   constructor(
-    private _checkersService: CheckersService
+    private _checkersService: CheckersService,
+    private firestore: FirestoreService
   ) { }
 
   ngOnInit(): void {
-    this.board = new Board(this._checkersService.boardSize, this._checkersService.boardSize, new CheckersBoardStyle(), new CheckersEngine());
-    console.log("segundo " + this.board.board[0][0].piece.getPieceImg());
+    this.board = new BoardManager(this._checkersService.boardSize, this._checkersService.boardSize, 
+      new CheckersBoardStyle(), new CheckersEngine(this.firestore, '123'));
     //this.openDialog();
   }
 

@@ -1,7 +1,8 @@
-import { Board } from "./board";
+import { BoardManager } from "./board-manager";
 
 export abstract class Engine {
-    abstract initGame(board: Board);
+
+    abstract initGame(boardManager: BoardManager);
 
     abstract click(row: Number, column: Number);
 }

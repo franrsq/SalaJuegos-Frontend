@@ -2,7 +2,7 @@ import { BoardStyle } from "./board-style";
 import { Engine } from "./engine"
 import { Space } from "./space";
 
-export class Board {
+export class BoardManager {
     board: Space[][];
     engine: Engine;
 
@@ -17,8 +17,10 @@ export class Board {
     }
 
     highlight(spaces: Space[]) {
-        for (let i = 0; i < spaces.length; i++) {
-            spaces[i].highlight = true;
+        if (spaces != null) {
+            for (let i = 0; i < spaces.length; i++) {
+                spaces[i].highlight = true;
+            }
         }
     }
 
