@@ -1,11 +1,10 @@
-import { Injectable, NgZone } from '@angular/core';
-import { Observable, Subscription } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { AngularFireAuth } from "@angular/fire/auth";
 import firebase from 'firebase/app';
-import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { Router } from "@angular/router";
 import { User } from '../model/user';
-import { Space } from 'src/app/game/space';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +15,7 @@ export class AuthService {
   nickNameSubscription: Subscription;
 
   constructor(
-    public firestore: AngularFirestore,
+    public firebase: AngularFireDatabase,
     public afAuth: AngularFireAuth, // Inject Firebase auth service
     public router: Router
   ) {
@@ -37,9 +36,10 @@ export class AuthService {
         if (this.nickNameSubscription) {
           this.nickNameSubscription.unsubscribe();
         }
-        this.nickNameSubscription = this.firestore.collection('users').doc(user.uid)
+        this.nickNameSubscription = this.firebase.object('users/' + user.uid)
           .valueChanges()
           .subscribe((data: any) => {
+            console.log(data)
             if (data) {
               this.userData['nickname'] = data.nickname;
               localStorage.setItem('nickname', JSON.stringify(data));
@@ -103,13 +103,11 @@ export class AuthService {
   }
 
   private saveNickName(nickname, user) {
-    const userRef: AngularFirestoreDocument<any> = this.firestore.doc(`users/${user.uid}`);
+    const userRef = this.firebase.object(`users/${user.uid}`);
     const userData = {
       nickname: nickname,
     };
-    return userRef.set(userData, {
-      merge: true
-    });
+    return userRef.set(userData);
   }
 
   // Sign out 

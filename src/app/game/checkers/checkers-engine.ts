@@ -1,4 +1,4 @@
-import { FirestoreService } from "src/app/shared/services/firestore.service";
+import { FirebaseService } from "src/app/shared/services/firebase.service";
 import { BoardManager } from "../board-manager";
 import { Engine } from "../engine"
 import { Space } from "../space";
@@ -10,17 +10,17 @@ export class CheckersEngine extends Engine {
     boardManager: BoardManager;
     selectedSpace: Space = null;
     possiblePlays: Space[] = [];
-    firestore: FirestoreService;
+    firebaseService: FirebaseService;
 
-    constructor(firestore: FirestoreService, gameId) {
+    constructor(firebaseService: FirebaseService, gameId) {
         super();
         this.gameId = gameId;
-        this.firestore = firestore;
+        this.firebaseService = firebaseService;
     }
 
     initGame(boardManager: BoardManager) {
         this.boardManager = boardManager;
-        this.firestore.observeGame('checkers', this.gameId).subscribe((data: any) => {
+        this.firebaseService.observeGame('checkers', this.gameId).subscribe((data: any) => {
             let i = 0;
             for (let array in data) {
                 let j = 0;

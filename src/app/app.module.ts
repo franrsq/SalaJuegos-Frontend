@@ -28,7 +28,7 @@ import { AngularFireAuthModule } from "@angular/fire/auth";
 import { environment } from 'src/environments/environment';
 import { AuthService } from "./shared/services/auth.service";
 import { USE_EMULATOR as USE_AUTH_EMULATOR } from '@angular/fire/auth';
-import { USE_EMULATOR as USE_FIRESTORE_EMULATOR } from '@angular/fire/firestore';
+import { USE_EMULATOR as USE_DATABASE_EMULATOR } from '@angular/fire/database';
 
 // Components
 import { LoginComponent } from './components/login/login.component';
@@ -78,7 +78,7 @@ import { NicknameDialogComponent } from './components/nickname-dialog/nickname-d
   providers: [
     AuthService,
     { provide: USE_AUTH_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9099] : undefined },
-    { provide: USE_FIRESTORE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 8080] : undefined },
+    { provide: USE_DATABASE_EMULATOR, useValue: environment.useEmulators ? ['localhost', 9000] : undefined },
   ],
   bootstrap: [AppComponent]
 })

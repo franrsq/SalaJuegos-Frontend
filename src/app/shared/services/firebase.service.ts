@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/firestore';
+import { AngularFireDatabase } from '@angular/fire/database';
 import { Space } from 'src/app/game/space';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FirestoreService {
+export class FirebaseService {
 
-  constructor(private firestore: AngularFirestore) { }
+  constructor(private database: AngularFireDatabase) { }
 
   observeGame(gamePath, gameId) {
-    return this.firestore.collection(gamePath).doc(gameId).valueChanges();
+    return this.database.object(`games/${gamePath}/${gameId}`).valueChanges();
   }
 
   injectTable(board: Space[][]) {
-    let data = {};
+    let data = [];
     for (let i = 0; i < board.length; i++) {
       let array = [];
       for (let j = 0; j < board[i].length; j++) {
@@ -26,6 +26,6 @@ export class FirestoreService {
       }
       data[i] = array;
     }
-    this.firestore.collection('checkers').doc('123').set(data);
+    this.database.object('games/checkers/123').set(data);
   }
 }
