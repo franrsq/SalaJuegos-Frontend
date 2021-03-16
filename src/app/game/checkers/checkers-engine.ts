@@ -1,3 +1,5 @@
+import { Subject } from "rxjs";
+import { takeUntil } from "rxjs/operators"
 import { FirebaseService } from "src/app/shared/services/firebase.service";
 import { BoardManager } from "../board-manager";
 import { Engine } from "../engine"
@@ -6,37 +8,58 @@ import { BlackPiece } from "./black-piece";
 import { RedPiece } from "./red-piece";
 
 export class CheckersEngine extends Engine {
-    gameId;
+    private unsubscribe = new Subject<void>();
+    aiType;
     boardManager: BoardManager;
     selectedSpace: Space = null;
     possiblePlays: Space[] = [];
-    firebaseService: FirebaseService;
 
-    constructor(firebaseService: FirebaseService, gameId) {
-        super();
-        this.gameId = gameId;
-        this.firebaseService = firebaseService;
+    constructor(firebaseService: FirebaseService, aiType = null) {
+        super(firebaseService);
+        this.aiType = aiType;
     }
 
     initGame(boardManager: BoardManager) {
         this.boardManager = boardManager;
-        this.firebaseService.observeGame('checkers', this.gameId).subscribe((data: any) => {
-            let i = 0;
-            for (let array in data) {
-                let j = 0;
-                for (let value of data[array]) {
-                    if (value == 0 || value == 1) {
-                        boardManager.board[i][j].piece = new BlackPiece(value);
-                    } else if (value == 2 || value == 3) {
-                        boardManager.board[i][j].piece = new RedPiece(value);
-                    } else {
-                        boardManager.board[i][j].piece = null;
-                    }
-                    j++;
-                }
-                i++;
-            }
+        this.firebaseService.sendCommand('checkers', {
+            command: 'play_ai',
+            height: 8,
+            width: 8,
+            aiType: this.aiType
         });
+        if (this.aiType) {
+            this.firebaseService.observePlayerStates()
+                .pipe(takeUntil(this.unsubscribe))
+                .subscribe((res: any) => {
+                    if (res) {
+                        this.firebaseService.observeGame(res.gamePath, res.game)
+                            .pipe(takeUntil(this.unsubscribe))
+                            .subscribe((res: any) => {
+                                if (res) {
+                                    this.loadGameMatrix(res.gameMatrix);
+                                }
+                            });
+                    }
+                });
+        }
+    }
+
+    private loadGameMatrix(matrix: [][]) {
+        let i = 0;
+        for (let row in matrix) {
+            let j = 0;
+            for (let value of matrix[row]) {
+                if (value == 0 || value == 1) {
+                    this.boardManager.board[i][j].piece = new BlackPiece(value);
+                } else if (value == 2 || value == 3) {
+                    this.boardManager.board[i][j].piece = new RedPiece(value);
+                } else {
+                    this.boardManager.board[i][j].piece = null;
+                }
+                j++;
+            }
+            i++;
+        }
     }
 
     click(row, column) {
@@ -150,5 +173,10 @@ export class CheckersEngine extends Engine {
                 this.possiblePlays = this.possibleBlackSpaces(row, column);
             }
         }
+    }
+
+    destroyGame() {
+        this.unsubscribe.next();
+        this.unsubscribe.complete();
     }
 }

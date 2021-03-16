@@ -21,7 +21,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from "@angular/flex-layout";
 
-
 //Firebase
 import { AngularFireModule } from "@angular/fire";
 import { AngularFireAuthModule } from "@angular/fire/auth";
@@ -38,7 +37,7 @@ import { ChooseGameComponent } from './components/choose-game/choose-game.compon
 
 import { ToastrModule } from 'ngx-toastr';
 import { GameBoardComponent } from './components/game-board/game-board.component';
-import { BoardSizeDialogComponent } from './components/board-size-dialog/board-size-dialog.component';
+import { NewCheckersDialogComponent } from './components/new-checkers-dialog/new-checkers-dialog.component';
 import { NicknameDialogComponent } from './components/nickname-dialog/nickname-dialog.component';
 
 @NgModule({
@@ -49,7 +48,7 @@ import { NicknameDialogComponent } from './components/nickname-dialog/nickname-d
     ForgotPasswordComponent,
     ChooseGameComponent,
     GameBoardComponent,
-    BoardSizeDialogComponent,
+    NewCheckersDialogComponent,
     NicknameDialogComponent
   ],
   imports: [

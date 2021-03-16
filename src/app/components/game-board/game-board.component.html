@@ -1,5 +1,5 @@
 <div class="board">
-    <div class="row" *ngFor="let row of board.board">
+    <div class="row" *ngFor="let row of boardManager.board">
         <div (click)="spaceClick(space)" class="space" *ngFor="let space of row">
             <img [src]="space.getStyle()">
             <div *ngIf="!space.piece; else notnull">

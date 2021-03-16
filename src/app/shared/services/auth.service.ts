@@ -39,7 +39,6 @@ export class AuthService {
         this.nickNameSubscription = this.firebase.object('users/' + user.uid)
           .valueChanges()
           .subscribe((data: any) => {
-            console.log(data)
             if (data) {
               this.userData['nickname'] = data.nickname;
               localStorage.setItem('nickname', JSON.stringify(data));

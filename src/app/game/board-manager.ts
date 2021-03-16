@@ -31,4 +31,8 @@ export class BoardManager {
             }
         }
     }
+
+    destroyGame() {
+        this.engine.destroyGame();
+    }
 }

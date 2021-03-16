@@ -1,0 +1,15 @@
+<h2 mat-dialog-title>Crear nuevo juego</h2>
+
+<mat-dialog-content [formGroup]="form">
+
+  <mat-form-field class="margin">
+    <input matInput type="number" placeholder="Tamaño" formControlName="boardSize">
+    <mat-error>*Este campo es <strong>requerido</strong></mat-error>
+  </mat-form-field>
+
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button [disabled]="form.invalid" class="mat-raised-button mat-primary" (click)="play()">Jugar</button>
+  <button mat-button class="mat-raised-button mat-warn" (click)="close()">Cancelar</button>
+</mat-dialog-actions>

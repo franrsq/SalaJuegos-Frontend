@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BoardSizeDialogComponent } from './board-size-dialog.component';
+import { NewCheckersDialogComponent } from './new-checkers-dialog.component';
 
 describe('BoardSizeDialogComponent', () => {
-  let component: BoardSizeDialogComponent;
-  let fixture: ComponentFixture<BoardSizeDialogComponent>;
+  let component: NewCheckersDialogComponent;
+  let fixture: ComponentFixture<NewCheckersDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ BoardSizeDialogComponent ]
+      declarations: [ NewCheckersDialogComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BoardSizeDialogComponent);
+    fixture = TestBed.createComponent(NewCheckersDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

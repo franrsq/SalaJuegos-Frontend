@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
-import { BoardSizeDialogComponent } from '../board-size-dialog/board-size-dialog.component';
+import { NewCheckersDialogComponent } from '../new-checkers-dialog/new-checkers-dialog.component';
 import { NicknameDialogComponent } from '../nickname-dialog/nickname-dialog.component';
 
 @Component({
@@ -24,18 +24,13 @@ export class ChooseGameComponent implements OnInit {
   }
 
   openDialog(multiplayer: Boolean): void {
-    const dialogRef = this.dialog.open(BoardSizeDialogComponent, {
-      disableClose: true,
-      width: '35%',
-      height: '45%',
-      data: { size: this.size }
+    const dialogRef = this.dialog.open(NewCheckersDialogComponent, {
+      autoFocus: true,
+      width: '250px'
     });
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      if (multiplayer) {
-        this.router.navigateByUrl('/game-board');
-      } else {
-        this.router.navigateByUrl('/game-board');
+      if (result) {
+        this.router.navigate(['/game-board', { aiType: 0 }]);
       }
     });
   }
@@ -45,7 +40,9 @@ export class ChooseGameComponent implements OnInit {
       disableClose: true,
       autoFocus: true
     }).afterClosed().subscribe(result => {
-      this.authService.saveNickname(result.nickname);
+      if (result) {
+        this.authService.saveNickname(result.nickname);
+      }
     });
   }
 }
