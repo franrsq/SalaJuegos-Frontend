@@ -229,3 +229,27 @@ function canJump(fromRow: number, fromCol: number, gameMatrix: number[][]) {
 
     return false;
 }
+
+function getWinner(gameMatrix: number[][]) : number{
+    let piezaNegra = false
+    let piezaRoja = false
+
+    for (let i = 0; i < gameMatrix.length; i++) {
+        for (let k = 0; k < gameMatrix[i].length; k++) {
+            if(gameMatrix[i][k] == 0 || gameMatrix[i][k] == 1){
+                piezaNegra = true; //Existe una pieza negra en el tablero
+            }
+            if(gameMatrix[i][k] == 2 || gameMatrix[i][k] == 3){
+                piezaRoja = true // Existe una pieza roja en el tablero
+            }
+        }
+    }
+    
+    if(piezaNegra && piezaRoja == false){
+        return 1; //Gana negro
+    }else if(piezaRoja && piezaNegra == false){
+        return 2; // Gana rojo
+    }else{
+        return 0; //nadie gana
+    }   
+}
