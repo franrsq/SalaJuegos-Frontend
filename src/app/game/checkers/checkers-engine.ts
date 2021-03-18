@@ -75,7 +75,15 @@ export class CheckersEngine extends Engine {
                 this.selectedSpace = this.boardManager.board[row][column];
             }
         } else if (this.possiblePlays.includes(this.boardManager.board[row][column])) {
-            this.moveSelectedPiece(row, column);
+            this.firebaseService.sendCommand('checkers', {
+                command: "move",
+                fromRow: this.selectedSpace.row,
+                fromCol: this.selectedSpace.column,
+                toRow: row,
+                toCol: column
+            }).then(res => {
+                this.clearSelection();
+            });
         } else {
             this.clearSelection();
         }
@@ -84,31 +92,6 @@ export class CheckersEngine extends Engine {
     clearSelection() {
         this.possiblePlays = [];
         this.selectedSpace = null;
-    }
-
-    moveSelectedPiece(row, column) {
-        let selectedRow = this.selectedSpace.row;
-        let selectedColumn = this.selectedSpace.column;
-
-        this.boardManager.board[row][column].piece =
-            this.boardManager.board[selectedRow][selectedColumn].piece;
-        this.boardManager.board[selectedRow][selectedColumn].piece = null;
-
-        // Jumped over a piece
-        if (Math.abs(this.selectedSpace.row - row) == 2) {
-            console.log(0)
-            if (selectedRow - row == -2 && selectedColumn - column == 2) { // izq abajo
-                this.boardManager.board[selectedRow + 1][selectedColumn - 1].piece = null;
-            } else if (selectedRow - row == -2 && selectedColumn - column == -2) { // der abajo
-                this.boardManager.board[selectedRow + 1][selectedColumn + 1].piece = null;
-            } else if (selectedRow - row == 2 && selectedColumn - column == 2) { // izq arriba
-                this.boardManager.board[selectedRow - 1][selectedColumn - 1].piece = null;
-            } else if (selectedRow - row == 2 && selectedColumn - column == -2) { // der arriba
-                this.boardManager.board[selectedRow - 1][selectedColumn + 1].piece = null;
-            }
-        }
-
-        this.clearSelection();
     }
 
     possibleBlackSpaces(row, column): Space[] {
