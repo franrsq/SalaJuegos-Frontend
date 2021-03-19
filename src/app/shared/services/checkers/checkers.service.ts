@@ -6,6 +6,7 @@ import { Injectable } from '@angular/core';
 export class CheckersService {
 
   boardSize: number = 8;
+  multiplayer: Boolean;
 
   constructor() { }
 }

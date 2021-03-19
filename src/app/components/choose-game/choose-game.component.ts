@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/shared/services/auth.service';
+import { CheckersService } from 'src/app/shared/services/checkers/checkers.service';
 import { NewCheckersDialogComponent } from '../new-checkers-dialog/new-checkers-dialog.component';
 import { NicknameDialogComponent } from '../nickname-dialog/nickname-dialog.component';
 
@@ -14,7 +15,12 @@ export class ChooseGameComponent implements OnInit {
 
   size: string;
 
-  constructor(public dialog: MatDialog, private router: Router, private authService: AuthService) { }
+  constructor(
+    public dialog: MatDialog, 
+    private router: Router, 
+    private authService: AuthService,
+    private _checkersService: CheckersService
+    ) { }
 
   ngOnInit(): void {
     const data = JSON.parse(localStorage.getItem('nickname'));
@@ -24,6 +30,7 @@ export class ChooseGameComponent implements OnInit {
   }
 
   openDialog(multiplayer: Boolean): void {
+    this._checkersService.multiplayer = multiplayer;
     const dialogRef = this.dialog.open(NewCheckersDialogComponent, {
       autoFocus: true,
       width: '250px'

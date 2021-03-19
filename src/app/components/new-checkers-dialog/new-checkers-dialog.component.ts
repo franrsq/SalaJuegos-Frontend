@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { CheckersService } from 'src/app/shared/services/checkers/checkers.service';
 
@@ -10,11 +10,13 @@ import { CheckersService } from 'src/app/shared/services/checkers/checkers.servi
 })
 export class NewCheckersDialogComponent {
   form: FormGroup;
+  player = 1; // 1 play first, 2 play second
+  level = 1; // 1 eassy, 2 medium, 3 hard
 
   constructor(
     private formBuilder: FormBuilder,
     private dialogRef: MatDialogRef<NewCheckersDialogComponent>,
-    private _checkersService: CheckersService) { }
+    public _checkersService: CheckersService) { }
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({

@@ -9,6 +9,24 @@
 
 </mat-dialog-content>
 
+<br>
+
+<label>Seleccione cuándo desea empezar a jugar</label>
+<mat-radio-group [(ngModel)]="player" aria-label="Select an option">
+  <mat-radio-button [value]="1">Jugar de primero</mat-radio-button>
+  <mat-radio-button [value]="2">Jugar de segundo</mat-radio-button>
+</mat-radio-group>
+
+<div *ngIf="_checkersService.multiplayer">
+  <br>
+  <label>Seleccione el nivel de dificultad</label>
+  <mat-radio-group [(ngModel)]="level" aria-label="Select an option">
+    <mat-radio-button [value]="1">Nivel fácil</mat-radio-button>
+    <mat-radio-button [value]="2">Nivel intermedio</mat-radio-button>
+    <mat-radio-button [value]="3">Nivel difícil</mat-radio-button>
+  </mat-radio-group>
+</div>
+
 <mat-dialog-actions>
   <button mat-button [disabled]="form.invalid" class="mat-raised-button mat-primary" (click)="play()">Jugar</button>
   <button mat-button class="mat-raised-button mat-warn" (click)="close()">Cancelar</button>

@@ -20,6 +20,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from "@angular/flex-layout";
+import { MatRadioModule } from '@angular/material/radio';
 
 //Firebase
 import { AngularFireModule } from "@angular/fire";
@@ -73,6 +74,7 @@ import { NicknameDialogComponent } from './components/nickname-dialog/nickname-d
     MatCardModule,
     FlexLayoutModule,
     ToastrModule.forRoot(),
+    MatRadioModule,
   ],
   providers: [
     AuthService,
