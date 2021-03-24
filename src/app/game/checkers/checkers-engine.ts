@@ -10,38 +10,48 @@ import { RedPiece } from "./red-piece";
 export class CheckersEngine extends Engine {
     private unsubscribe = new Subject<void>();
     aiType;
+    wantsToStart;
     boardManager: BoardManager;
     selectedSpace: Space = null;
     possiblePlays: Space[] = [];
 
-    constructor(firebaseService: FirebaseService, aiType = null) {
+    constructor(firebaseService: FirebaseService, aiType = null, wantsToStart = null) {
         super(firebaseService);
         this.aiType = aiType;
+        this.wantsToStart = wantsToStart;
     }
 
     initGame(boardManager: BoardManager) {
         this.boardManager = boardManager;
-        this.firebaseService.sendCommand('checkers', {
-            command: 'play_ai',
-            height: 8,
-            width: 8,
-            aiType: this.aiType
-        });
-        if (this.aiType) {
-            this.firebaseService.observePlayerStates()
-                .pipe(takeUntil(this.unsubscribe))
-                .subscribe((res: any) => {
-                    if (res) {
-                        this.firebaseService.observeGame(res.gamePath, res.game)
-                            .pipe(takeUntil(this.unsubscribe))
-                            .subscribe((res: any) => {
-                                if (res) {
-                                    this.loadGameMatrix(res.gameMatrix);
-                                }
-                            });
-                    }
-                });
+        if (this.aiType !== null) {
+            this.firebaseService.sendCommand('checkers', {
+                command: 'play_ai',
+                rows: boardManager.board.length,
+                columns: boardManager.board[0].length,
+                aiType: this.aiType
+            });
+        } else {
+            this.firebaseService.sendCommand('checkers', {
+                command: 'match',
+                rows: boardManager.board.length,
+                columns: boardManager.board[0].length,
+                wantsToStart: this.wantsToStart
+            });
         }
+        this.firebaseService.observePlayerStates()
+            .pipe(takeUntil(this.unsubscribe))
+            .subscribe((res: any) => {
+                if (res) {
+                    this.firebaseService.observeGame(res.gamePath, res.game)
+                        .pipe(takeUntil(this.unsubscribe))
+                        .subscribe((res: any) => {
+                            if (res) {
+                                console.log(1);
+                                this.loadGameMatrix(res.gameMatrix);
+                            }
+                        });
+                }
+            });
     }
 
     private loadGameMatrix(matrix: [][]) {

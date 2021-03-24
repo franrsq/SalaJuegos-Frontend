@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CheckersBoardStyle } from 'src/app/game/checkers/checkers-style';
-import { CheckersService } from 'src/app/shared/services/checkers/checkers.service';
 import { FirebaseService } from 'src/app/shared/services/firebase.service';
 import { BoardManager } from '../../game/board-manager';
 import { CheckersEngine } from "../../game/checkers/checkers-engine";
@@ -16,15 +15,18 @@ export class GameBoardComponent implements OnInit, OnDestroy {
   boardManager: BoardManager;
 
   constructor(
-    private _checkersService: CheckersService,
     private firebaseService: FirebaseService,
     private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    const aiType = this.route.snapshot.paramMap.get('aiType');
-    this.boardManager = new BoardManager(this._checkersService.boardSize, this._checkersService.boardSize,
-      new CheckersBoardStyle(), new CheckersEngine(this.firebaseService, aiType));
+    const strAiType = this.route.snapshot.paramMap.get('aiType');
+    const aiType = strAiType ? parseInt(strAiType) : null;
+    const rows = parseInt(this.route.snapshot.paramMap.get('rows'));
+    const cols = parseInt(this.route.snapshot.paramMap.get('cols'));
+    const wantsToStart = parseInt(this.route.snapshot.paramMap.get('wantsToStart'));
+    this.boardManager = new BoardManager(rows, cols,
+      new CheckersBoardStyle(), new CheckersEngine(this.firebaseService, aiType, wantsToStart));
   }
 
   spaceClick(space) {

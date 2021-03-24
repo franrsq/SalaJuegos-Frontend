@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { CheckersService } from 'src/app/shared/services/checkers/checkers.service';
 
 @Component({
   selector: 'app-new-checkers-dialog',
@@ -12,16 +11,25 @@ export class NewCheckersDialogComponent {
   form: FormGroup;
   player = 1; // 1 play first, 2 play second
   level = 1; // 1 eassy, 2 medium, 3 hard
+  multiplayer: boolean;
 
   constructor(
     private formBuilder: FormBuilder,
-    private dialogRef: MatDialogRef<NewCheckersDialogComponent>,
-    public _checkersService: CheckersService) { }
+    private dialogRef: MatDialogRef<NewCheckersDialogComponent>) { }
 
   ngOnInit(): void {
-    this.form = this.formBuilder.group({
-      boardSize: ['', Validators.required]
-    });
+    if (this.multiplayer) {
+      this.form = this.formBuilder.group({
+        boardSize: ['', Validators.required],
+        wantsToStart: ['', Validators.required]
+      });
+    } else {
+      this.form = this.formBuilder.group({
+        boardSize: ['', Validators.required],
+        wantsToStart: ['', Validators.required],
+        difficulty: ['', Validators.required]
+      });
+    }
   }
 
   play() {

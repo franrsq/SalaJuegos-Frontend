@@ -11,7 +11,7 @@ export const checkersCommands = functions.database.ref('/commands/checkers/{uid}
         let commandPromise;
         switch (commandName) {
             case 'match':
-                commandPromise = Promise.reject('Not implemented');
+                commandPromise = checkersMatch(context.params.uid, command);
                 break;
             case 'move':
                 commandPromise = checkersMove(context.params.uid, command);
@@ -29,36 +29,96 @@ export const checkersCommands = functions.database.ref('/commands/checkers/{uid}
         return Promise.all([commandPromise, removePromise]);
     });
 
-/*function checkersMatch() {
+function checkersMatch(uid: string, command: any) {
+    const wantsToStart = command.wantsToStart;
+    const rows = parseInt(command.rows);
+    const columns = parseInt(command.columns);
 
-}*/
+    let matchingCheckRef: any, matchingRequestRef: any;
+    let p1uid: any, p2uid: any;
+    if (wantsToStart) {
+        matchingCheckRef = admin.database().ref(`matching/second/${rows}/${columns}`);
+        matchingRequestRef = admin.database().ref(`matching/first/${rows}/${columns}`);
+    } else {
+        matchingCheckRef = admin.database().ref(`matching/first/${rows}/${columns}`);
+        matchingRequestRef = admin.database().ref(`matching/second/${rows}/${columns}`);
+    }
 
-function checkersPlayAi(uid: string, command: any) {
-    const height = parseInt(command.height);
-    const width = parseInt(command.width);
-    const aiType = parseInt(command.aiType);
+    // TODO: convert to transaction
+    return matchingCheckRef.once('value').then((data: any) => {
+        const matchVal = data.val();
+        if (matchVal === null) {
+            console.log(`${uid} waiting for match. wantsToStart ${wantsToStart} rows ${rows} colums ${columns}`);
+            const matchingPromise = matchingRequestRef.set({ uid: uid });
+            matchingPromise.then(() => {
+                return admin.database().ref(`player_states/${uid}`).set({
+                    matching: true
+                });
+            });
+            return matchingPromise;
+        } else {
+            // Matched with another player
+            p1uid = wantsToStart ? uid : matchVal.uid;
+            p2uid = wantsToStart ? matchVal.uid : uid;
 
+            console.log(`Matched ${p1uid} with ${p2uid}`);
+
+            const gameRef = admin.database().ref("games/checkers").push()
+            const gamePromise = gameRef.set({
+                p1uid: p1uid,
+                p2uid: p2uid,
+                turn: p1uid,
+                gameMatrix: createCheckersBoard(rows, columns)
+            });
+
+            const gameId = gameRef.key
+            console.log(`Starting game ${gameId} with p1uid: ${p1uid}, p2uid: ${p2uid}`)
+            const p1StatePromise = admin.database().ref(`player_states/${p1uid}`).set({
+                game: gameId,
+                gamePath: 'checkers',
+                message: "It's your turn! Make a move!"
+            });
+            const p2StatePromise = admin.database().ref(`player_states/${p2uid}`).set({
+                game: gameId,
+                gamePath: 'checkers',
+                message: "Waiting for other player..."
+            });
+            return Promise.all([gamePromise, p1StatePromise, p2StatePromise, matchingCheckRef.remove()]);
+        }
+    });
+}
+
+function createCheckersBoard(rows: number, columns: number) {
     let gameMatrix: number[][] = [];
-    for (let i = 0; i < height; i++) {
+    for (let i = 0; i < rows; i++) {
         gameMatrix[i] = [];
-        for (let j = 0; j < width; j++) {
+        for (let j = 0; j < columns; j++) {
             if (((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1))
-                && i < (height / 2) - 1) {
+                && i < (rows / 2) - 1) {
                 gameMatrix[i][j] = 0;
             } else if (((i % 2 == 0 && j % 2 == 0) || (i % 2 == 1 && j % 2 == 1))
-                && i > (height / 2)) {
+                && i > (rows / 2)) {
                 gameMatrix[i][j] = 2;
             } else {
                 gameMatrix[i][j] = -1;
             }
         }
     }
+
+    return gameMatrix;
+}
+
+function checkersPlayAi(uid: string, command: any) {
+    const rows = parseInt(command.rows);
+    const columns = parseInt(command.columns);
+    const aiType = parseInt(command.aiType);
+
     const gameRef = admin.database().ref('games/checkers').push();
     const gamePromise = gameRef.set({
         p1uid: uid,
         p2uid: aiType,
         turn: uid,
-        gameMatrix: gameMatrix
+        gameMatrix: createCheckersBoard(rows, columns)
     });
     const p1StatePromise = admin.database().ref(`player_states/${uid}`).set({
         game: gameRef.key,
@@ -230,26 +290,26 @@ function canJump(fromRow: number, fromCol: number, gameMatrix: number[][]) {
     return false;
 }
 
-function getWinner(gameMatrix: number[][]) : number{
-    let piezaNegra = false
-    let piezaRoja = false
+function getWinner(gameMatrix: number[][]): number {
+    let blackPiece = false
+    let redPiece = false
 
     for (let i = 0; i < gameMatrix.length; i++) {
         for (let k = 0; k < gameMatrix[i].length; k++) {
-            if(gameMatrix[i][k] == 0 || gameMatrix[i][k] == 1){
-                piezaNegra = true; //Existe una pieza negra en el tablero
+            if (gameMatrix[i][k] == 0 || gameMatrix[i][k] == 1) {
+                blackPiece = true; //Existe una pieza negra en el tablero
             }
-            if(gameMatrix[i][k] == 2 || gameMatrix[i][k] == 3){
-                piezaRoja = true // Existe una pieza roja en el tablero
+            if (gameMatrix[i][k] == 2 || gameMatrix[i][k] == 3) {
+                redPiece = true // Existe una pieza roja en el tablero
             }
         }
     }
-    
-    if(piezaNegra && piezaRoja == false){
-        return 1; //Gana negro
-    }else if(piezaRoja && piezaNegra == false){
+
+    if (blackPiece && redPiece == false) {
+        return 1; // Gana negro
+    } else if (redPiece && blackPiece == false) {
         return 2; // Gana rojo
-    }else{
-        return 0; //nadie gana
-    }   
+    } else {
+        return 0; // nadie gana
+    }
 }

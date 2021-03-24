@@ -5,7 +5,7 @@ export abstract class Engine {
 
     firebaseService: FirebaseService;
 
-    constructor(firebaseService: FirebaseService, aiType = null) {
+    constructor(firebaseService: FirebaseService, aiType = null, wantsToStart = null) {
         this.firebaseService = firebaseService;
     }
 
