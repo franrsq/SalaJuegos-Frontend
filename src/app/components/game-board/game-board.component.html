@@ -1,4 +1,8 @@
-<div class="board" *ngIf="boardManager">
+<div style="display: flex; height: 100%;" *ngIf="!boardManager || boardManager.isLoading()">
+    <mat-spinner style="margin: auto;"></mat-spinner>
+</div>
+
+<div class="board" *ngIf="boardManager && !boardManager.isLoading()">
     <div class="row" *ngFor="let row of boardManager.board">
         <div (click)="spaceClick(space)" class="space" *ngFor="let space of row">
             <img [src]="space.getStyle()">

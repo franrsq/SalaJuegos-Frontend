@@ -21,6 +21,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { MatRadioModule } from '@angular/material/radio';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 //Firebase
 import { AngularFireModule } from "@angular/fire";
@@ -75,6 +76,7 @@ import { NicknameDialogComponent } from './components/nickname-dialog/nickname-d
     FlexLayoutModule,
     ToastrModule.forRoot(),
     MatRadioModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     AuthService,

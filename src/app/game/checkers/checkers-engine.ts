@@ -1,4 +1,4 @@
-import { Subject } from "rxjs";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators"
 import { FirebaseService } from "src/app/shared/services/firebase.service";
 import { BoardManager } from "../board-manager";
@@ -11,6 +11,7 @@ export class CheckersEngine extends Engine {
     private unsubscribe = new Subject<void>();
     aiType;
     wantsToStart;
+    matched = new BehaviorSubject<boolean>(false);
     boardManager: BoardManager;
     selectedSpace: Space = null;
     possiblePlays: Space[] = [];
@@ -41,12 +42,15 @@ export class CheckersEngine extends Engine {
         this.firebaseService.observePlayerStates()
             .pipe(takeUntil(this.unsubscribe))
             .subscribe((res: any) => {
-                if (res) {
+                if (res && res.matching) {
+                    this.matched.next(false);
+                }
+                else if (res) {
+                    this.matched.next(true);
                     this.firebaseService.observeGame(res.gamePath, res.game)
                         .pipe(takeUntil(this.unsubscribe))
                         .subscribe((res: any) => {
                             if (res) {
-                                console.log(1);
                                 this.loadGameMatrix(res.gameMatrix);
                             }
                         });
@@ -166,6 +170,10 @@ export class CheckersEngine extends Engine {
                 this.possiblePlays = this.possibleBlackSpaces(row, column);
             }
         }
+    }
+
+    isLoading(): Observable<boolean> {
+        return this.matched.asObservable().pipe(takeUntil(this.unsubscribe));
     }
 
     destroyGame() {

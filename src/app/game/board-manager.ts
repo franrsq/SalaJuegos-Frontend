@@ -32,6 +32,10 @@ export class BoardManager {
         }
     }
 
+    isLoading() {
+        return this.engine.isLoading();
+    }
+
     destroyGame() {
         this.engine.destroyGame();
     }
