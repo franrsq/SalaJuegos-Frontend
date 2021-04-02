@@ -3,6 +3,16 @@
 </div>
 
 <div class="board" *ngIf="boardManager && !boardManager.isLoading()">
+    <div>
+        <mat-toolbar>
+            <span>{{player1}}</span>
+
+            <span class="spacer"></span>
+            VS
+            <span class="spacer"></span>
+            <span>{{player2}}</span>
+        </mat-toolbar>
+    </div>
     <div class="row" *ngFor="let row of boardManager.board">
         <div (click)="spaceClick(space)" class="space" *ngFor="let space of row">
             <img [src]="space.getStyle()">

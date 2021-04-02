@@ -39,3 +39,7 @@
         width: 37.25px;
     }
 }
+
+.spacer {
+    flex: 1 1 auto;
+  }
