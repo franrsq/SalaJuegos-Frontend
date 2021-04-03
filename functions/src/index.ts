@@ -1,3 +1,4 @@
+import { moveAI } from "./ai/checkersAi";
 import * as functions from "firebase-functions";
 import * as admin from 'firebase-admin'
 admin.initializeApp()
@@ -18,6 +19,9 @@ export const checkersCommands = functions.database.ref('/commands/checkers/{uid}
                 break;
             case 'play_ai':
                 commandPromise = checkersPlayAi(context.params.uid, command);
+                break;
+            case 'move_ai':
+                commandPromise = checkersMoveAi(context.params.uid, command);
                 break;
             default:
                 commandPromise = Promise.reject('Unknown command');
@@ -112,12 +116,13 @@ function checkersPlayAi(uid: string, command: any) {
     const rows = parseInt(command.rows);
     const columns = parseInt(command.columns);
     const aiType = parseInt(command.aiType);
+    const wantsToStart = command.wantsToStart;
 
     const gameRef = admin.database().ref('games/checkers').push();
     const gamePromise = gameRef.set({
-        p1uid: uid,
-        p2uid: aiType,
-        turn: uid,
+        p1uid: wantsToStart ? uid : aiType,
+        p2uid: wantsToStart ? aiType : uid,
+        turn: wantsToStart ? uid : aiType,
         gameMatrix: createCheckersBoard(rows, columns)
     });
     const p1StatePromise = admin.database().ref(`player_states/${uid}`).set({
@@ -127,6 +132,40 @@ function checkersPlayAi(uid: string, command: any) {
     });
 
     return Promise.all([gamePromise, p1StatePromise]);
+}
+
+function checkersMoveAi(uid: string, command: any) {
+    const playerStateRef = admin.database().ref(`player_states/${uid}`);
+
+    return playerStateRef.once('value')
+        .then(snap => {
+            const playerState = snap.val();
+            if (playerState && playerState.game) {
+                return admin.database().ref(`games/checkers/${playerState.game}`)
+                    .once('value')
+                    .then(gameSnap => {
+                        const game = gameSnap.val();
+                        if (game.turn == 0 || game.turn == 1 || game.turn == 2) {
+                            console.log('AI movement');
+                            const mov = moveAI(game);
+                            //console.log(mov);
+                            const destRow = mov.path.length > 0 ? mov.path[mov.path.length - 2].x : mov.destRow;
+                            const destCol = mov.path.length > 0 ? mov.path[mov.path.length - 2].y : mov.destCol;
+                            return gameSnap.ref.update(applyMovement(game.turn, mov.srcRow, mov.srcCol,
+                                destRow, destCol, game));
+                        }
+                        console.log("It's not AI turn");
+                        throw new Error('not_ia_turn');
+                    });
+            } else {
+                throw new Error("not_in_game");
+            }
+        }).catch(err => {
+            console.log(`Move failed: ${err}`);
+            return playerStateRef.update({
+                message: err.message
+            });
+        });
 }
 
 function checkersMove(uid: string, command: any) {
@@ -144,9 +183,8 @@ function checkersMove(uid: string, command: any) {
                 return admin.database().ref(`games/checkers/${playerState.game}`)
                     .once('value')
                     .then(gameSnap => {
-                        gameSnap.ref.update(
-                            applyMovement(uid, fromRow, fromCol, toRow, toCol, gameSnap.val())
-                        );
+                        return gameSnap.ref.update(applyMovement(uid, fromRow, fromCol, toRow, toCol,
+                            gameSnap.val()));
                     });
             } else {
                 throw new Error("not_in_game");
@@ -164,18 +202,13 @@ function applyMovement(uid: string, fromRow: number, fromCol: number, toRow: num
     const p1uid = game.p1uid;
     const p2uid = game.p2uid;
 
-    let playerNumber;
-    if (uid == p1uid) {
-        playerNumber = 1; // pieces 0 and 1
-        if (game.gameMatrix[fromRow][fromCol] != 0 && game.gameMatrix[fromRow][fromCol] != 1) {
-            throw new Error("not_your_piece");
-        }
-    } else if (uid == p2uid) {
-        playerNumber = 2;  // pieces 2 and 3
-        if (game.gameMatrix[fromRow][fromCol] != 2 && game.gameMatrix[fromRow][fromCol] != 3) {
-            throw new Error("not_your_piece");
-        }
-    } else {
+    if (uid == p1uid
+        && (game.gameMatrix[fromRow][fromCol] != 0 && game.gameMatrix[fromRow][fromCol] != 1)) {
+        throw new Error("not_your_piece");
+    } else if (uid == p2uid
+        && (game.gameMatrix[fromRow][fromCol] != 2 && game.gameMatrix[fromRow][fromCol] != 3)) {
+        throw new Error("not_your_piece");
+    } else if (uid != p1uid && uid != p2uid) {
         throw new Error("not_in_game");
     }
     // Check if it's player's turn
@@ -187,9 +220,13 @@ function applyMovement(uid: string, fromRow: number, fromCol: number, toRow: num
     const movementDistance = Math.abs(fromRow - toRow);
     // If jumped over a piece and there is another to jump we don't have
     // to change the turn
-    if (movementDistance != 2 || !canJump(toRow, toCol, game.gameMatrix)) {
+    console.log(game.gameMatrix[toRow][toCol]);
+    console.log(movementDistance != 2);
+    console.log(!canJump(game.gameMatrix[toRow][toCol], game.gameMatrix));
+    if (movementDistance != 2 || !canJump(game.gameMatrix[toRow][toCol], game.gameMatrix)) {
         // Change turns
-        game.turn = playerNumber == 1 ? p2uid : p1uid
+        game.turn = game.turn == p1uid ? p2uid : p1uid;
+        console.log('changing turns');
     }
 
     return game;
@@ -223,8 +260,9 @@ function attemptCheckersMovement(fromRow: number, fromCol: number, toRow: number
     }
 
     // It's a piece moving a single space (not jumping), check if there
-    // is a possible enemy to jump and if there is then it's an invalid movement
-    if ((absDistance == 1) && canJump(fromRow, fromCol, gameMatrix)) {
+    // is a possible enemy to jump anywhere in the board and if there is 
+    // then it's an invalid movement
+    if ((absDistance == 1) && canJump(pieceValue, gameMatrix)) {
         console.log('Invalid move. There is a possible enemy to jump');
         throw new Error("invalid_movement");
     }
@@ -245,52 +283,59 @@ function attemptCheckersMovement(fromRow: number, fromCol: number, toRow: number
     if (toRow == gameMatrix.length - 1 && pieceValue == 0) {
         gameMatrix[toRow][toCol] = 1;
     } // Check if a red piece was crowned
-    else if (toRow == 0 && pieceValue == 0) {
+    else if (toRow == 0 && pieceValue == 2) {
         gameMatrix[toRow][toCol] = 3;
     } else {
         gameMatrix[toRow][toCol] = pieceValue;
     }
 }
 
-function canJump(fromRow: number, fromCol: number, gameMatrix: number[][]) {
-    const pieceValue = gameMatrix[fromRow][fromCol];
+function canJump(pieceValue: number, gameMatrix: number[][]) {
     const enemy = (pieceValue == 0) || (pieceValue == 1) ? 2 : 0;
     const enemyCrown = (pieceValue == 0) || (pieceValue == 1) ? 3 : 1;
+    const ally = (pieceValue == 0) || (pieceValue == 1) ? 0 : 2;
+    const allyCrown = (pieceValue == 0) || (pieceValue == 1) ? 1 : 3;
 
-    const downRight = (fromRow + 1 < gameMatrix.length && fromCol + 1 < gameMatrix[0].length)
-        ? gameMatrix[fromRow + 1][fromCol + 1] : null;
-    const downLeft = (fromRow + 1 < gameMatrix.length && fromCol - 1 > 0)
-        ? gameMatrix[fromRow + 1][fromCol - 1] : null;
-    const downRightSpace = (fromRow + 2 < gameMatrix.length && fromCol + 2 < gameMatrix[0].length)
-        ? gameMatrix[fromRow + 2][fromCol + 2] : null;
-    const downLeftSpace = (fromRow + 2 < gameMatrix.length && fromCol - 2 > 0)
-        ? gameMatrix[fromRow + 2][fromCol - 2] : null;
-    // Downwards
-    if ((pieceValue != 2) &&
-        (((downRight == enemy || downRight == enemyCrown) && downRightSpace == -1)
-            || ((downLeft == enemy || downLeft == enemyCrown) && downLeftSpace == -1))) {
-        return true;
-    }
+    for (let i = 0; i < gameMatrix.length; i++) {
+        for (let j = 0; j < gameMatrix[0].length; j++) {
+            if (gameMatrix[i][j] == ally || gameMatrix[i][j] == allyCrown) {
+                const downRight = (i + 1 < gameMatrix.length && j + 1 < gameMatrix[0].length)
+                    ? gameMatrix[i + 1][j + 1] : null;
+                const downLeft = (i + 1 < gameMatrix.length && j - 1 >= 0)
+                    ? gameMatrix[i + 1][j - 1] : null;
+                const downRightSpace = (i + 2 < gameMatrix.length && j + 2 < gameMatrix[0].length)
+                    ? gameMatrix[i + 2][j + 2] : null;
+                const downLeftSpace = (i + 2 < gameMatrix.length && j - 2 >= 0)
+                    ? gameMatrix[i + 2][j - 2] : null;
+                // Downwards
+                if ((pieceValue != 2) &&
+                    (((downRight == enemy || downRight == enemyCrown) && downRightSpace == -1)
+                        || ((downLeft == enemy || downLeft == enemyCrown) && downLeftSpace == -1))) {
+                    return true;
+                }
 
-    const upRight = (fromRow - 1 > 0 && fromCol + 1 < gameMatrix[0].length)
-        ? gameMatrix[fromRow - 1][fromCol + 1] : null;
-    const upLeft = (fromRow - 1 > 0 && fromCol - 1 > 0)
-        ? gameMatrix[fromRow - 1][fromCol - 1] : null;
-    const upRightSpace = (fromRow - 2 > 0 && fromCol + 2 < gameMatrix[0].length)
-        ? gameMatrix[fromRow - 2][fromCol + 2] : null;
-    const upLeftSpace = (fromRow - 2 > 0 && fromCol - 2 > 0)
-        ? gameMatrix[fromRow - 2][fromCol - 2] : null;
-    // Upwards
-    if ((pieceValue != 0) &&
-        (((upRight == enemy || upRight == enemyCrown) && upRightSpace == -1)
-            || ((upLeft == enemy || upLeft == enemyCrown) && upLeftSpace == -1))) {
-        return true;
+                const upRight = (i - 1 >= 0 && j + 1 < gameMatrix[0].length)
+                    ? gameMatrix[i - 1][j + 1] : null;
+                const upLeft = (i - 1 >= 0 && j - 1 >= 0)
+                    ? gameMatrix[i - 1][j - 1] : null;
+                const upRightSpace = (i - 2 >= 0 && j + 2 < gameMatrix[0].length)
+                    ? gameMatrix[i - 2][j + 2] : null;
+                const upLeftSpace = (i - 2 >= 0 && j - 2 >= 0)
+                    ? gameMatrix[i - 2][j - 2] : null;
+                // Upwards
+                if ((pieceValue != 0) &&
+                    (((upRight == enemy || upRight == enemyCrown) && upRightSpace == -1)
+                        || ((upLeft == enemy || upLeft == enemyCrown) && upLeftSpace == -1))) {
+                    return true;
+                }
+            }
+        }
     }
 
     return false;
 }
 
-function getWinner(gameMatrix: number[][]): number {
+/*function getWinner(gameMatrix: number[][]): number {
     let blackPiece = false
     let redPiece = false
 
@@ -312,4 +357,4 @@ function getWinner(gameMatrix: number[][]): number {
     } else {
         return 0; // nadie gana
     }
-}
+}*/

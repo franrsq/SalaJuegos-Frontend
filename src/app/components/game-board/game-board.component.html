@@ -1,8 +1,6 @@
-<div style="display: flex; height: 100%;" *ngIf="!boardManager || boardManager.isLoading()">
-    <mat-spinner style="margin: auto;"></mat-spinner>
-</div>
 
-<div class="board" *ngIf="boardManager && !boardManager.isLoading()">
+
+<div class="board" *ngIf="boardManager">
     <div>
         <mat-toolbar>
             <span>{{player1}}</span>

@@ -15,6 +15,7 @@ export class CheckersEngine extends Engine {
     boardManager: BoardManager;
     selectedSpace: Space = null;
     possiblePlays: Space[] = [];
+    turnUid;
 
     constructor(firebaseService: FirebaseService, aiType = null, wantsToStart = null) {
         super(firebaseService);
@@ -29,7 +30,8 @@ export class CheckersEngine extends Engine {
                 command: 'play_ai',
                 rows: boardManager.board.length,
                 columns: boardManager.board[0].length,
-                aiType: this.aiType
+                aiType: this.aiType,
+                wantsToStart: this.wantsToStart
             });
         } else {
             this.firebaseService.sendCommand('checkers', {
@@ -51,11 +53,24 @@ export class CheckersEngine extends Engine {
                         .pipe(takeUntil(this.unsubscribe))
                         .subscribe((res: any) => {
                             if (res) {
+                                console.log('update')
+                                this.turnUid = res.turn;
                                 this.loadGameMatrix(res.gameMatrix);
+                                if (this.turnUid == 0 || this.turnUid == 1 || this.turnUid == 2) {
+                                    this.requestAiMovement();
+                                }
                             }
                         });
                 }
             });
+    }
+
+    private requestAiMovement() {
+        setTimeout(() => {
+            this.firebaseService.sendCommand('checkers', {
+                command: 'move_ai'
+            });
+        }, 500);
     }
 
     private loadGameMatrix(matrix: [][]) {
