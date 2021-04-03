@@ -72,6 +72,7 @@ function checkersMatch(uid: string, command: any) {
                 p1uid: p1uid,
                 p2uid: p2uid,
                 turn: p1uid,
+                winner: -1,
                 gameMatrix: createCheckersBoard(rows, columns)
             });
 
@@ -123,6 +124,7 @@ function checkersPlayAi(uid: string, command: any) {
         p1uid: wantsToStart ? uid : aiType,
         p2uid: wantsToStart ? aiType : uid,
         turn: wantsToStart ? uid : aiType,
+        winner: -1,
         gameMatrix: createCheckersBoard(rows, columns)
     });
     const p1StatePromise = admin.database().ref(`player_states/${uid}`).set({
@@ -220,14 +222,12 @@ function applyMovement(uid: string, fromRow: number, fromCol: number, toRow: num
     const movementDistance = Math.abs(fromRow - toRow);
     // If jumped over a piece and there is another to jump we don't have
     // to change the turn
-    console.log(game.gameMatrix[toRow][toCol]);
-    console.log(movementDistance != 2);
-    console.log(!canJump(game.gameMatrix[toRow][toCol], game.gameMatrix));
     if (movementDistance != 2 || !canJump(game.gameMatrix[toRow][toCol], game.gameMatrix)) {
         // Change turns
         game.turn = game.turn == p1uid ? p2uid : p1uid;
         console.log('changing turns');
     }
+    game.winner = getWinner(game.gameMatrix) == 1 ? p1uid : getWinner(game.gameMatrix) == 2 ? p2uid : -1;
 
     return game;
 }
@@ -308,7 +308,7 @@ function canJump(pieceValue: number, gameMatrix: number[][]) {
                 const downLeftSpace = (i + 2 < gameMatrix.length && j - 2 >= 0)
                     ? gameMatrix[i + 2][j - 2] : null;
                 // Downwards
-                if ((pieceValue != 2) &&
+                if ((gameMatrix[i][j] != 2) &&
                     (((downRight == enemy || downRight == enemyCrown) && downRightSpace == -1)
                         || ((downLeft == enemy || downLeft == enemyCrown) && downLeftSpace == -1))) {
                     return true;
@@ -323,7 +323,7 @@ function canJump(pieceValue: number, gameMatrix: number[][]) {
                 const upLeftSpace = (i - 2 >= 0 && j - 2 >= 0)
                     ? gameMatrix[i - 2][j - 2] : null;
                 // Upwards
-                if ((pieceValue != 0) &&
+                if ((gameMatrix[i][j] != 0) &&
                     (((upRight == enemy || upRight == enemyCrown) && upRightSpace == -1)
                         || ((upLeft == enemy || upLeft == enemyCrown) && upLeftSpace == -1))) {
                     return true;
@@ -335,26 +335,26 @@ function canJump(pieceValue: number, gameMatrix: number[][]) {
     return false;
 }
 
-/*function getWinner(gameMatrix: number[][]): number {
-    let blackPiece = false
-    let redPiece = false
+function getWinner(gameMatrix: number[][]): number {
+    let blackPiece = false;
+    let redPiece = false;
 
     for (let i = 0; i < gameMatrix.length; i++) {
-        for (let k = 0; k < gameMatrix[i].length; k++) {
+        for (let k = 0; k < gameMatrix[0].length; k++) {
             if (gameMatrix[i][k] == 0 || gameMatrix[i][k] == 1) {
                 blackPiece = true; //Existe una pieza negra en el tablero
             }
             if (gameMatrix[i][k] == 2 || gameMatrix[i][k] == 3) {
-                redPiece = true // Existe una pieza roja en el tablero
+                redPiece = true; // Existe una pieza roja en el tablero
             }
         }
     }
 
-    if (blackPiece && redPiece == false) {
+    if (blackPiece && !redPiece) {
         return 1; // Gana negro
-    } else if (redPiece && blackPiece == false) {
+    } else if (redPiece && !blackPiece) {
         return 2; // Gana rojo
     } else {
-        return 0; // nadie gana
+        return -1; // nadie gana
     }
-}*/
+}

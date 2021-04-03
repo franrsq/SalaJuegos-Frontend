@@ -14,8 +14,8 @@ export class Board {
     countDarkPieces = 0;
     matrix: number[][];
 
-    playerColor;
-    aiColor
+    playerColor: any;
+    aiColor: any;
 
     constructor(gameMatrix: number[][], playerColor: number, aiColor: number) {
         this.countLightKings = 0;

@@ -16,11 +16,14 @@ export class CheckersEngine extends Engine {
     selectedSpace: Space = null;
     possiblePlays: Space[] = [];
     turnUid;
+    playerIsRed;
+    playerUid;
 
     constructor(firebaseService: FirebaseService, aiType = null, wantsToStart = null) {
         super(firebaseService);
         this.aiType = aiType;
         this.wantsToStart = wantsToStart;
+        this.playerUid = JSON.parse(localStorage.getItem('user')).uid;
     }
 
     initGame(boardManager: BoardManager) {
@@ -59,6 +62,10 @@ export class CheckersEngine extends Engine {
                                 if (this.turnUid == 0 || this.turnUid == 1 || this.turnUid == 2) {
                                     this.requestAiMovement();
                                 }
+                                if (res.winner != -1) {
+                                    console.log('Ganó: ', res.winner);
+                                }
+                                this.playerIsRed = this.playerUid == res.p2uid;
                             }
                         });
                 }
@@ -123,68 +130,155 @@ export class CheckersEngine extends Engine {
         this.selectedSpace = null;
     }
 
-    possibleBlackSpaces(row, column): Space[] {
-        let spaces: Space[] = [];
-        if (this.boardManager.board[row][column].piece != null) {
-            if (column != (this.boardManager.board[0].length - 1)) {
-                if (this.boardManager.board[row + 1][column + 1].piece == null) { //Si en el lugar a mover no hay una pieza
-                    spaces = [this.boardManager.board[row + 1][column + 1]]; // entonces es un espacio disponible
-                } else if (this.boardManager.board[row + 1][column + 1].piece.getPieceImg().includes("black")) { //si en el lugar a mover hay una pieza negra
-                    console.log("no se puede jugar hay un aliado derecha") // no se puede jugar ahi
-                } else if (!this.boardManager.board[row + 2][column + 2].piece) { // Enemigo y se puede comer
-                    console.log("es enemigo y se puede comer") //aqui va a ir la logica de si es un enemigo
-                    spaces.push(this.boardManager.board[row + 2][column + 2]);
-                }
-            }
-            if (column != 0) {
-                if (this.boardManager.board[row + 1][column - 1].piece == null) {
-                    spaces.push(this.boardManager.board[row + 1][column - 1]); // entonces es un espacio disponible
-                } else if (this.boardManager.board[row + 1][column - 1].piece.getPieceImg().includes("black")) {
-                    console.log("no se puede jugar hay un aliado izquierda")
-                } else if (!this.boardManager.board[row + 2][column - 2].piece) {
-                    console.log("es enemigo y se puede comer") //aqui va a ir la logica de si es un enemigo
-                    spaces.push(this.boardManager.board[row + 2][column - 2]);
-                }
-            }
-        }
-        return spaces;
-    }
+    possibleSpaces(row, column): Space[] {
+        const piece = this.boardManager.board[row][column].piece;
+        const gameMatrix = this.boardManager.board;
+        const ally = (this.playerIsRed) ? 2 : 0;
+        const allyCrown = (this.playerIsRed) ? 3 : 1;
 
-    possibleRedSpaces(row, column): Space[] {
-        let spaces: Space[] = [];
-        if (this.boardManager.board[row][column].piece != null) {
-            if (column != (this.boardManager.board[0].length - 1)) {
-                if (this.boardManager.board[row - 1][column + 1].piece == null) { //Si en el lugar a mover no hay una pieza
-                    spaces = [this.boardManager.board[row - 1][column + 1]]; // entonces es un espacio disponible
-                } else if (this.boardManager.board[row - 1][column + 1].piece.getPieceImg().includes("red")) { //si en el lugar a mover hay una pieza negra
-                    console.log("no se puede jugar hay un aliado derecha") // no se puede jugar ahi
-                } else if (!this.boardManager.board[row - 2][column + 2].piece) {
-                    console.log("es enemigo y se puede comer") //aqui va a ir la logica de si es un enemigo
-                    spaces.push(this.boardManager.board[row - 2][column + 2]);
-                }
-            }
-            if (column != 0) {
-                if (this.boardManager.board[row - 1][column - 1].piece == null) {
-                    spaces.push(this.boardManager.board[row - 1][column - 1]); // entonces es un espacio disponible
-                } else if (this.boardManager.board[row - 1][column - 1].piece.getPieceImg().includes("red")) {
-                    console.log("no se puede jugar hay un aliado izquierda")
-                } else if (!this.boardManager.board[row - 2][column - 2].piece) {
-                    console.log("es enemigo y se puede comer") //aqui va a ir la logica de si es un enemigo
-                    spaces.push(this.boardManager.board[row - 2][column - 2]);
-                }
-            }
+        if (piece == null || (piece.pieceType != ally && piece.pieceType != allyCrown)) {
+            return [];
         }
-        return spaces;
+
+        // Si hay alguna pieza que puedo saltar
+        if (this.canJump(0)) {
+            // si la pieza actual tiene algo que se pueda saltar
+            return this.possibleJumpsPiece(row, column);
+        } else {
+            let spaces: Space[] = [];
+            const upRight = (row - 1 >= 0 && column + 1 < gameMatrix[0].length)
+                ? gameMatrix[row - 1][column + 1] : null;
+            const upLeft = (row - 1 >= 0 && column - 1 >= 0)
+                ? gameMatrix[row - 1][column - 1] : null;
+            const downRight = (row + 1 < gameMatrix.length && column + 1 < gameMatrix[0].length)
+                ? gameMatrix[row + 1][column + 1] : null;
+            const downLeft = (row + 1 < gameMatrix.length && column - 1 >= 0)
+                ? gameMatrix[row + 1][column - 1] : null;
+
+            // Arriba
+            if (piece.pieceType != 0 && (upRight && !upRight.piece)) {
+                spaces.push(upRight);
+            }
+            if (piece.pieceType != 0 && (upLeft && !upLeft.piece)) {
+                spaces.push(upLeft);
+            }
+
+            // Abajo
+            if (piece.pieceType != 2 && (downRight && !downRight.piece)) {
+                spaces.push(downRight);
+            }
+            if (piece.pieceType != 2 && (downLeft && !downLeft.piece)) {
+                spaces.push(downLeft);
+            }
+            return spaces;
+        }
     }
 
     calculatePossiblePlays(row, column) {
-        if (this.boardManager.board[row][column].piece != null) {
-            if (this.boardManager.board[row][column].piece.getPieceImg().includes("red")) {
-                this.possiblePlays = this.possibleRedSpaces(row, column);
-            } else {
-                this.possiblePlays = this.possibleBlackSpaces(row, column);
+        if (this.turnUid == this.playerUid && this.boardManager.board[row][column].piece != null) {
+            this.possiblePlays = this.possibleSpaces(row, column);
+        }
+    }
+
+    canJump(pieceValue: number) {
+        const gameMatrix = this.boardManager.board;
+        const enemy = (pieceValue == 0) || (pieceValue == 1) ? 2 : 0;
+        const enemyCrown = (pieceValue == 0) || (pieceValue == 1) ? 3 : 1;
+        const ally = (pieceValue == 0) || (pieceValue == 1) ? 0 : 2;
+        const allyCrown = (pieceValue == 0) || (pieceValue == 1) ? 1 : 3;
+
+        for (let i = 0; i < gameMatrix.length; i++) {
+            for (let j = 0; j < gameMatrix[0].length; j++) {
+                if (gameMatrix[i][j].piece?.pieceType == ally
+                    || gameMatrix[i][j].piece?.pieceType == allyCrown) {
+                    const downRight = (i + 1 < gameMatrix.length && j + 1 < gameMatrix[0].length)
+                        ? gameMatrix[i + 1][j + 1] : null;
+                    const downLeft = (i + 1 < gameMatrix.length && j - 1 >= 0)
+                        ? gameMatrix[i + 1][j - 1] : null;
+                    const downRightSpace = (i + 2 < gameMatrix.length && j + 2 < gameMatrix[0].length)
+                        ? gameMatrix[i + 2][j + 2] : null;
+                    const downLeftSpace = (i + 2 < gameMatrix.length && j - 2 >= 0)
+                        ? gameMatrix[i + 2][j - 2] : null;
+                    // Downwards
+                    if ((pieceValue != 2) &&
+                        (((downRight?.piece?.pieceType == enemy || downRight?.piece?.pieceType == enemyCrown)
+                            && (downRightSpace && !downRightSpace.piece))
+                            || ((downLeft?.piece?.pieceType == enemy || downLeft?.piece?.pieceType == enemyCrown)
+                                && (downLeftSpace && !downLeftSpace.piece)))) {
+                        return true;
+                    }
+
+                    const upRight = (i - 1 >= 0 && j + 1 < gameMatrix[0].length)
+                        ? gameMatrix[i - 1][j + 1] : null;
+                    const upLeft = (i - 1 >= 0 && j - 1 >= 0)
+                        ? gameMatrix[i - 1][j - 1] : null;
+                    const upRightSpace = (i - 2 >= 0 && j + 2 < gameMatrix[0].length)
+                        ? gameMatrix[i - 2][j + 2] : null;
+                    const upLeftSpace = (i - 2 >= 0 && j - 2 >= 0)
+                        ? gameMatrix[i - 2][j - 2] : null;
+                    // Upwards
+                    if ((pieceValue != 0) &&
+                        (((upRight?.piece?.pieceType == enemy || upRight?.piece?.pieceType == enemyCrown)
+                            && (upRightSpace && !upRightSpace.piece))
+                            || ((upLeft?.piece?.pieceType == enemy || upLeft?.piece?.pieceType == enemyCrown)
+                                && (upLeftSpace && !upLeftSpace.piece)))) {
+                        return true;
+                    }
+                }
             }
         }
+
+        return false;
+    }
+
+    possibleJumpsPiece(row, column): Space[] {
+        const gameMatrix = this.boardManager.board;
+        const pieceValue = gameMatrix[row][column].piece.pieceType;
+        const enemy = (pieceValue == 0) || (pieceValue == 1) ? 2 : 0;
+        const enemyCrown = (pieceValue == 0) || (pieceValue == 1) ? 3 : 1;
+        const spaces: Space[] = [];
+
+        const downRight = (row + 1 < gameMatrix.length && column + 1 < gameMatrix[0].length)
+            ? gameMatrix[row + 1][column + 1] : null;
+        const downLeft = (row + 1 < gameMatrix.length && column - 1 >= 0)
+            ? gameMatrix[row + 1][column - 1] : null;
+        const downRightSpace = (row + 2 < gameMatrix.length && column + 2 < gameMatrix[0].length)
+            ? gameMatrix[row + 2][column + 2] : null;
+        const downLeftSpace = (row + 2 < gameMatrix.length && column - 2 >= 0)
+            ? gameMatrix[row + 2][column - 2] : null;
+        // Downwards
+        if ((pieceValue != 2) &&
+            (((downRight?.piece?.pieceType == enemy || downRight?.piece?.pieceType == enemyCrown)
+                && (downRightSpace && !downRightSpace.piece)))) {
+            spaces.push(downRightSpace);
+        }
+        if ((pieceValue != 2) &&
+            (((downLeft?.piece?.pieceType == enemy || downLeft?.piece?.pieceType == enemyCrown)
+                && (downLeftSpace && !downLeftSpace.piece)))) {
+            spaces.push(downLeftSpace);
+        }
+
+        const upRight = (row - 1 >= 0 && column + 1 < gameMatrix[0].length)
+            ? gameMatrix[row - 1][column + 1] : null;
+        const upLeft = (row - 1 >= 0 && column - 1 >= 0)
+            ? gameMatrix[row - 1][column - 1] : null;
+        const upRightSpace = (row - 2 >= 0 && column + 2 < gameMatrix[0].length)
+            ? gameMatrix[row - 2][column + 2] : null;
+        const upLeftSpace = (row - 2 >= 0 && column - 2 >= 0)
+            ? gameMatrix[row - 2][column - 2] : null;
+        // Upwards
+        if ((pieceValue != 0) &&
+            (((upRight?.piece?.pieceType == enemy || upRight?.piece?.pieceType == enemyCrown)
+                && (upRightSpace && !upRightSpace.piece)))) {
+            spaces.push(upRightSpace);
+        }
+        if ((pieceValue != 0) &&
+            (((upLeft?.piece?.pieceType == enemy || upLeft?.piece?.pieceType == enemyCrown)
+                && (upLeftSpace && !upLeftSpace.piece)))) {
+            spaces.push(upLeftSpace);
+        }
+
+        return spaces;
     }
 
     isLoading(): Observable<boolean> {

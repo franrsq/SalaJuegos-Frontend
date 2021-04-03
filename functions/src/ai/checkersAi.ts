@@ -35,6 +35,7 @@ function makeDecision(game: any) {
     });
     return result;
 }
+
 function minValue(state: Board, depth: number, alpha: number, beta: number) {
     if (depth == 0 || state.isGameOver()) {
         return state.heuristic();
@@ -52,6 +53,7 @@ function minValue(state: Board, depth: number, alpha: number, beta: number) {
     }
     return value;
 }
+
 function maxValue(state: Board, depth: number, alpha: number, beta: number) {
     if (depth == 0 || state.isGameOver()) {
         return state.heuristic();
