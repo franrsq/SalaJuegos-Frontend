@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Fin de partida</h2>
+
+<mat-dialog-content>
+    <h3 *ngIf="won; else lost">Felicidades!!. Ganó</h3>
+    <ng-template #lost>
+        <h3>Perdió :(. F.</h3>
+    </ng-template>
+
+</mat-dialog-content>
+
+<mat-dialog-actions>
+    <button mat-button class="mat-raised-button mat-primary" (click)="close()">Volver</button>
+</mat-dialog-actions>

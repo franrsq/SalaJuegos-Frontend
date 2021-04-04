@@ -20,7 +20,8 @@ export class NewCheckersDialogComponent {
   ngOnInit(): void {
     if (this.multiplayer) {
       this.form = this.formBuilder.group({
-        boardSize: ['', Validators.required],
+        boardSize: ['', [Validators.required, Validators.min(6),
+        Validators.max(14), Validators.pattern("^\\d*[02468]$")]],
         wantsToStart: ['', Validators.required]
       });
     } else {

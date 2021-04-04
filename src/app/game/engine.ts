@@ -4,6 +4,10 @@ import { BoardManager } from "./board-manager";
 
 export abstract class Engine {
 
+    static readonly GAME_IN_PLAY = 0;
+    static readonly GAME_LOST = 1;
+    static readonly GAME_WON = 2;
+
     firebaseService: FirebaseService;
 
     constructor(firebaseService: FirebaseService, aiType = null, wantsToStart = null) {
@@ -15,6 +19,8 @@ export abstract class Engine {
     abstract click(row: Number, column: Number);
 
     abstract isLoading(): Observable<boolean>;
+
+    abstract getGameStatus(): Observable<number>;
 
     abstract destroyGame();
 }

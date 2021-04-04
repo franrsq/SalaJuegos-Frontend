@@ -1,8 +1,8 @@
 .board {
     display: block;
     margin: auto;
-    height: 600px;
-    width: 600px;
+    width: fit-content;
+    height: fit-content;
 }
 
 .row {
@@ -11,25 +11,21 @@
 
 .space {
     display: flex;
-    height: 75px;
-    width: 75px;
+    height: 65px;
+    width: 65px;
     position: relative;
     z-index: 1;
 }
 
 .piece {
-    height: 75px;
-    width: 75px;
+    height: 65px;
+    width: 65px;
     position: absolute;
     top: 0px;
     z-index: 3;
 }
 
 @media only screen and (max-width: 768px) {
-    .board {
-        height: 300px;
-        width: 300px;
-    }
     .space {
         height: 37.25px;
         width: 37.25px;
@@ -38,8 +34,16 @@
         height: 37.25px;
         width: 37.25px;
     }
+    .toolbar {
+        height: 40px;
+        font-size: small;
+    }
+}
+
+.toolbar {
+    background-color: white;
 }
 
 .spacer {
     flex: 1 1 auto;
-  }
+}

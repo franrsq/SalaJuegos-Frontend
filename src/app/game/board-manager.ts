@@ -1,3 +1,4 @@
+import { Observable } from "rxjs";
 import { BoardStyle } from "./board-style";
 import { Engine } from "./engine"
 import { Space } from "./space";
@@ -34,8 +35,12 @@ export class BoardManager {
         }
     }
 
-    isLoading() {
+    isLoading(): Observable<boolean> {
         return this.engine.isLoading();
+    }
+
+    getGameStatus(): Observable<number> {
+        return this.engine.getGameStatus();
     }
 
     destroyGame() {

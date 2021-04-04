@@ -11,13 +11,15 @@ export class CheckersEngine extends Engine {
     private unsubscribe = new Subject<void>();
     aiType;
     wantsToStart;
-    matched = new BehaviorSubject<boolean>(false);
+    loading = new BehaviorSubject<boolean>(true);
     boardManager: BoardManager;
     selectedSpace: Space = null;
     possiblePlays: Space[] = [];
     turnUid;
     playerIsRed;
     playerUid;
+    gameStatus = new BehaviorSubject<number>(Engine.GAME_IN_PLAY);
+    firstLoad = true;
 
     constructor(firebaseService: FirebaseService, aiType = null, wantsToStart = null) {
         super(firebaseService);
@@ -48,10 +50,10 @@ export class CheckersEngine extends Engine {
             .pipe(takeUntil(this.unsubscribe))
             .subscribe((res: any) => {
                 if (res && res.matching) {
-                    this.matched.next(false);
+                    this.loading.next(true);
                 }
                 else if (res) {
-                    this.matched.next(true);
+                    this.loading.next(false);
                     this.firebaseService.observeGame(res.gamePath, res.game)
                         .pipe(takeUntil(this.unsubscribe))
                         .subscribe((res: any) => {
@@ -62,10 +64,16 @@ export class CheckersEngine extends Engine {
                                 if (this.turnUid == 0 || this.turnUid == 1 || this.turnUid == 2) {
                                     this.requestAiMovement();
                                 }
-                                if (res.winner != -1) {
-                                    console.log('Ganó: ', res.winner);
+                                if (!this.firstLoad) {
+                                    if (res.winner == this.playerUid) {
+                                        this.gameStatus.next(Engine.GAME_WON);
+                                    } else if (res.winner != -1) {
+                                        this.gameStatus.next(Engine.GAME_LOST);
+                                    }
+                                    this.playerIsRed = this.playerUid == res.p2uid;
+                                } else {
+                                    this.firstLoad = false;
                                 }
-                                this.playerIsRed = this.playerUid == res.p2uid;
                             }
                         });
                 }
@@ -318,7 +326,11 @@ export class CheckersEngine extends Engine {
     }
 
     isLoading(): Observable<boolean> {
-        return this.matched.asObservable().pipe(takeUntil(this.unsubscribe));
+        return this.loading.asObservable().pipe(takeUntil(this.unsubscribe));
+    }
+
+    getGameStatus(): Observable<number> {
+        return this.gameStatus.asObservable().pipe(takeUntil(this.unsubscribe));
     }
 
     destroyGame() {

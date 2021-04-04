@@ -42,6 +42,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { GameBoardComponent } from './components/game-board/game-board.component';
 import { NewCheckersDialogComponent } from './components/new-checkers-dialog/new-checkers-dialog.component';
 import { NicknameDialogComponent } from './components/nickname-dialog/nickname-dialog.component';
+import { EndGameDialogComponent } from './components/end-game-dialog/end-game-dialog.component';
 
 @NgModule({
   declarations: [
@@ -52,7 +53,8 @@ import { NicknameDialogComponent } from './components/nickname-dialog/nickname-d
     ChooseGameComponent,
     GameBoardComponent,
     NewCheckersDialogComponent,
-    NicknameDialogComponent
+    NicknameDialogComponent,
+    EndGameDialogComponent
   ],
   imports: [
     BrowserModule,
