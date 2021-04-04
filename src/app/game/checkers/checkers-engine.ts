@@ -56,7 +56,7 @@ export class CheckersEngine extends Engine {
                         .pipe(takeUntil(this.unsubscribe))
                         .subscribe((res: any) => {
                             if (res) {
-                                console.log('update')
+                                this.loadPlayerInfo(res.p1uid, res.p2uid);
                                 this.turnUid = res.turn;
                                 this.loadGameMatrix(res.gameMatrix);
                                 if (this.turnUid == 0 || this.turnUid == 1 || this.turnUid == 2) {
@@ -78,6 +78,42 @@ export class CheckersEngine extends Engine {
                 command: 'move_ai'
             });
         }, 500);
+    }
+
+    private loadPlayerInfo(p1Uid, p2Uid) {
+        if (p1Uid == 0 || p1Uid == 1 || p1Uid == 2) {
+            this.boardManager.player1 = this.getAIPlayerText(p1Uid);
+        } else {
+            this.firebaseService.getPlayerData(p1Uid).subscribe((data: any) => {
+                let wins = (data.wins || 0);
+                let defeats = (data.defeats || 0);
+                let wd = (defeats == 0) ? 0 : wins / defeats;
+                this.boardManager.player1 = `${data.nickname}   W/D: ${wd}`;
+            });
+        }
+        if (p2Uid == 0 || p2Uid == 1 || p2Uid == 2) {
+            this.boardManager.player2 = this.getAIPlayerText(p2Uid);
+        } else {
+            this.firebaseService.getPlayerData(p2Uid).subscribe((data: any) => {
+                let wins = (data.wins || 0);
+                let defeats = (data.defeats || 0);
+                let wd = (defeats == 0) ? 0 : wins / defeats;
+                this.boardManager.player2 = `${data.nickname}   W/D: ${wd}`;
+            });
+        }
+    }
+
+    private getAIPlayerText(plUid) {
+        switch (plUid) {
+            case 0:
+                return 'IA fácil   W/D: 0.25';
+            case 1:
+                return 'IA intermedia   W/D: 0.50';
+            case 2:
+                return 'IA díficil   W/D: 0.75';
+            default:
+                return 'Ups';
+        }
     }
 
     private loadGameMatrix(matrix: [][]) {
@@ -141,7 +177,7 @@ export class CheckersEngine extends Engine {
         }
 
         // Si hay alguna pieza que puedo saltar
-        if (this.canJump(0)) {
+        if (this.canJump(piece.pieceType)) {
             // si la pieza actual tiene algo que se pueda saltar
             return this.possibleJumpsPiece(row, column);
         } else {

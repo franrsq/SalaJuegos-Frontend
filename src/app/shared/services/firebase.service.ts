@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/database';
-import { Space } from 'src/app/game/space';
+import { take } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 
 @Injectable({
@@ -21,5 +21,9 @@ export class FirebaseService {
 
   observePlayerStates() {
     return this.database.object(`player_states/${this.auth.userData.uid}`).valueChanges();
+  }
+
+  getPlayerData(uid: string) {
+    return this.database.object(`users/${uid}`).valueChanges().pipe(take(1));
   }
 }

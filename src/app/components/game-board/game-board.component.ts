@@ -13,8 +13,6 @@ import { CheckersEngine } from "../../game/checkers/checkers-engine";
 export class GameBoardComponent implements OnInit, OnDestroy {
 
   boardManager: BoardManager;
-  player1 = "Jugador 1";
-  player2 = "Jugador 2";
 
   constructor(
     private firebaseService: FirebaseService,

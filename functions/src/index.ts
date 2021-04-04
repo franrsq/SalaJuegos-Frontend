@@ -150,7 +150,7 @@ function checkersMoveAi(uid: string, command: any) {
                         if (game.turn == 0 || game.turn == 1 || game.turn == 2) {
                             console.log('AI movement');
                             const mov = moveAI(game);
-                            //console.log(mov);
+                            console.log(mov);
                             const destRow = mov.path.length > 0 ? mov.path[mov.path.length - 2].x : mov.destRow;
                             const destCol = mov.path.length > 0 ? mov.path[mov.path.length - 2].y : mov.destCol;
                             return gameSnap.ref.update(applyMovement(game.turn, mov.srcRow, mov.srcCol,
@@ -185,8 +185,23 @@ function checkersMove(uid: string, command: any) {
                 return admin.database().ref(`games/checkers/${playerState.game}`)
                     .once('value')
                     .then(gameSnap => {
-                        return gameSnap.ref.update(applyMovement(uid, fromRow, fromCol, toRow, toCol,
-                            gameSnap.val()));
+                        let gameUpdate = applyMovement(uid, fromRow, fromCol, toRow, toCol,
+                            gameSnap.val());
+                        let gameUpdateRef = gameSnap.ref.update(gameUpdate);
+                        if (gameUpdate.winner != -1) {
+                            let looserUid = (gameUpdate.winner == gameUpdate.p1uid)
+                                ? gameUpdate.p2uid : gameUpdate.p1uid
+                            let winnerRef = admin.database().ref(`users/${gameUpdate.winner}/wins`)
+                                .transaction(value => {
+                                    return (value || 0) + 1;
+                                });
+                            let looserRef = admin.database().ref(`users/${looserUid}/defeats`)
+                                .transaction(value => {
+                                    return (value || 0) + 1;
+                                });
+                            return Promise.all([gameUpdateRef, winnerRef, looserRef]);
+                        }
+                        return gameUpdateRef;
                     });
             } else {
                 throw new Error("not_in_game");

@@ -5,6 +5,8 @@ import { Space } from "./space";
 export class BoardManager {
     board: Space[][];
     engine: Engine;
+    player1: string;
+    player2: string;
 
     constructor(rows: number, columns: number, boardStyle: BoardStyle, engine: Engine) {
         this.board = boardStyle.generateBoard(rows, columns);
