@@ -95,7 +95,7 @@ export class CheckersEngine extends Engine {
             this.firebaseService.getPlayerData(p1Uid).subscribe((data: any) => {
                 let wins = (data.wins || 0);
                 let defeats = (data.defeats || 0);
-                let wd = (defeats == 0) ? 0 : wins / defeats;
+                let wd = (defeats == 0) ? 0 : wins / (wins + defeats);
                 this.boardManager.player1 = `${data.nickname}   W/D: ${wd}`;
             });
         }
@@ -105,7 +105,7 @@ export class CheckersEngine extends Engine {
             this.firebaseService.getPlayerData(p2Uid).subscribe((data: any) => {
                 let wins = (data.wins || 0);
                 let defeats = (data.defeats || 0);
-                let wd = (defeats == 0) ? 0 : wins / defeats;
+                let wd = (defeats == 0) ? 0 : wins / (wins + defeats);
                 this.boardManager.player2 = `${data.nickname}   W/D: ${wd}`;
             });
         }
